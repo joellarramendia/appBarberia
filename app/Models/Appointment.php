@@ -10,20 +10,26 @@ class Appointment extends Model
 {
     use hasFactory;
 
+    protected $primaryKey = 'appointment_id';
     protected $table = 'appointments';
 
     protected $fillable = [
-        'user_id',
-        'date',
-        'time',
+        'start_date',
+        'finish_date',
         'status',
+        'user_id',
     ];
 
-    public function user() {
-        return $this->belongsTo(User::class);
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function service() {
-        return $this->belongsToMany(Service::class, 'appointment_service')->withPivot('quantity');
+    public function service()
+    {
+        return $this->belongsToMany(Service::class, 'appointment_service', 'appointment_id');
     }
+
+
+
 }

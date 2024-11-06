@@ -257,7 +257,7 @@ return [
     */
 
     'use_route_url' => false,
-    'dashboard_url' => 'home',
+    'dashboard_url' => '/s',
     'logout_url' => 'logout',
     'login_url' => 'login',
     'register_url' => 'register',
@@ -320,34 +320,27 @@ return [
             'url' => 'admin/blog',
             'can' => 'manage-blog',
         ],
+        ['header' => 'Etiquetas'],
         [
-            'text' => 'pages',
-            'url' => 'admin/pages',
-            'icon' => 'far fa-fw fa-file',
-            'label' => 4,
-            'label_color' => 'success',
-        ],
-        ['header' => 'account_settings'],
-        [
-            'text' => 'Perfil',
-            'url' => 'admin/settings',
-            'icon' => 'fas fa-fw fa-user',
+            'text' => 'Citas',
+            'url' => 'admin/appointments',
+            'icon' => 'fas fa-fw fa-calendar',
         ],
         [
             'text' => 'Servicios',
-            'url' => 'admin/settings',
-            'icon' => 'fas fa-fw fa-user',
+            'url' => 'admin/services',
+            'icon' => 'fas fa-fw fa-hand-scissors',
         ],
         [
             'text' => 'Clientes Registrados',
-            'url' => 'admin/settings',
+            'url' => 'admin/registeredClients',
             'icon' => 'fas fa-fw fa-user',
-        ],
-        [
-            'text' => 'change_password',
+        ]
+        /*[
+            'text' => 'Cambiar Contraseña',
             'url' => 'admin/settings',
             'icon' => 'fas fa-fw fa-lock',
-        ]
+        ]*/
     ],
 
     /*

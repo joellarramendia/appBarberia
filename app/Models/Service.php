@@ -9,6 +9,7 @@ class Service extends Model
 {
     use HasFactory;
 
+    protected $primaryKey = 'service_id';
     protected $table = 'services';
 
     protected $fillable = [
@@ -18,7 +19,9 @@ class Service extends Model
         'duration',
     ];
 
-    public function appointment() {
-        return $this->belongsToMany(Appointment::class, 'appointment_service')->withPivot('quantity');
+    public function appointments()
+    {
+        return $this->belongsToMany(Appointment::class, 'service_id', 'appointment_id');
     }
+
 }

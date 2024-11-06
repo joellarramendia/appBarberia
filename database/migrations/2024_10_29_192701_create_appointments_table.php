@@ -12,12 +12,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('appointments', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->date('date');
-            $table->time('time');
+            $table->id('appointment_id');
+            $table->dateTime('start_date');
+            $table->dateTime('finish_date');
             $table->enum('status', ['earring', 'confirmed', 'canceled'])->default('earring');
+            $table->unsignedBigInteger('user_id');
             $table->timestamps();
+
+            // Clave foránea para usuarios
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+
         });
     }
 
