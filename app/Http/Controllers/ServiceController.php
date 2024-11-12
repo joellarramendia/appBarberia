@@ -13,7 +13,7 @@ class ServiceController extends Controller
         $request->validate([
             'name' => 'required',
             'description' => 'required',
-            'price' => 'required',
+            'price' => 'required|integer|min:0', // Asegura que el precio sea un entero
             'duration' => 'required',
         ]);
 
