@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ServiceController;
 
 Route::get('/', function () {
     return view('auth/login');
@@ -11,7 +12,7 @@ Route::get('/', function () {
 //admin
 Route::get('/admin/appointments', function () {
     return view('admin.appointments');
-});/*->middleware(['auth', 'verified'])->name('dashboard');*/
+})->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::get('/admin/services', function () {
     return view('admin.services');
@@ -25,6 +26,10 @@ Route::get('/admin/registeredClients', function () {
 Route::get('/cliente', function () {
     return view('cliente.index');
 });
+
+//quiero que hagas la ruta para ServiceController
+Route::post('/service', [ServiceController::class, 'createService']);
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

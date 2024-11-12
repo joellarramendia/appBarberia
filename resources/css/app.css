@@ -1,3 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Importa Material Tailwind */
+@import "@material-tailwind/html/css/material-tailwind.css";
+
+/* Para que no hay diferencia de color en el fondo */
+.content-wrapper {
+    background-color: #f4f6f9 !important;
+}
+
+body {
+    background-color: #f4f6f9 !important;
+}
