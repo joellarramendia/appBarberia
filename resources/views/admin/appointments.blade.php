@@ -5,7 +5,7 @@
 @section('content_header')
     <h1>Administrador</h1>
     <div class="text-right">
-      <a href="{{ url('admin/services') }}" class="btn btn-success col-2.5">
+      <a href="{{ url('services/index') }}" class="btn btn-success col-2.5">
       <i class='fa fa-plus'> </i> Nueva cita
       </a>
     </div>
