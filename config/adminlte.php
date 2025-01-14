@@ -328,7 +328,7 @@ return [
         ],
         [
             'text' => 'Servicios',
-            'url' => 'admin/services',
+            'url' => 'services/index',
             'icon' => 'fas fa-fw fa-hand-scissors',
         ],
         [
@@ -424,12 +424,17 @@ return [
             ],
         ],
         'Sweetalert2' => [
-            'active' => false,
+            'active' => true,
             'files' => [
                 [
                     'type' => 'js',
-                    'asset' => false,
-                    'location' => '//cdn.jsdelivr.net/npm/sweetalert2@8',
+                    'asset' => true,
+                    'location' => 'https://cdn.jsdelivr.net/npm/sweetalert2@11.15.10/dist/sweetalert2.all.min.js',
+                ],
+                [
+                    'type' => 'css',
+                    'asset' => true,
+                    'location' => 'https://cdn.jsdelivr.net/npm/sweetalert2@11.15.10/dist/sweetalert2.min.css',
                 ],
             ],
         ],

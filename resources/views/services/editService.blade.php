@@ -20,13 +20,13 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="text-left" for="editName">Nombre del Servicio</label>
-                                    <input type="text" class="form-control" id="editName" name="editName" required>
+                                    <input type="text" class="form-control" id="editName" name="name" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="editPrice">Precio del Servicio</label>
-                                    <input type="number" class="form-control" id="editPrice" name="editPrice" required>
+                                    <input type="number" class="form-control" id="editPrice" name="price" required>
                                 </div>
                             </div>
                         </div>
@@ -35,13 +35,13 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="editDescription">Descripción del Servicio</label>
-                                    <textarea class="form-control" id="editDescription" name="editDescription" rows="3" required></textarea>
+                                    <textarea class="form-control" id="editDescription" name="description" rows="3" required></textarea>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="editDuration">Duración del Servicio (en minutos)</label>
-                                    <input type="number" class="form-control" id="editDuration" name="editDuration" step="0.01" required>
+                                    <input type="number" class="form-control" id="editDuration" name="duration" step="0.01" required>
                                 </div>
                             </div>
                         </div>

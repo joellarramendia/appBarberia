@@ -10,5 +10,6 @@ Route::get('/user', function (Request $request) {
 
 
 Route::post('/createService', [ServiceController::class, 'createService']);
+Route::get('/getService/{service_id}', [ServiceController::class, 'getService']);
+Route::post('/updateService/{service_id}', [ServiceController::class, 'updateService']);
 Route::delete('/deleteService/{service_id}', [ServiceController::class, 'deleteService']);
-Route::put('/updateService/{service_id}', [ServiceController::class, 'updateService']);

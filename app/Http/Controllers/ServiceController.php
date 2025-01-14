@@ -19,7 +19,7 @@ class ServiceController extends Controller
         // Validar los datos del formulario
         $validated = $request->validate([
         'name' => 'required|string|max:255',
-        'price' => 'required|numeric|min:0',
+        'price' => 'required|numeric|min:1',
         'description' => 'required|string|max:1000',
         'duration' => 'required|numeric|min:1', // Validar duración mayor a 0
         ]);

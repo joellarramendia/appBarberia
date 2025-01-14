@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id('service_id');
             $table->string('name');
             $table->text('description')->nullable();
-            $table->decimal('price');
+            $table->integer('price');
             $table->integer('duration');
             $table->timestamps();
         });
