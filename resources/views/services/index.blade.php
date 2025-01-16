@@ -15,7 +15,7 @@
 </div>
 
     <!-- Modal Nueva Cita -->
-    <div class="modal fade" id="cargarServicio" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="nuevaServicio" aria-hidden="true">
+    <div class="modal fade" id="cargarServicio" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="nuevoServicio" aria-hidden="true"> >
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -75,17 +75,17 @@
 
 @section('content')
 <!-- Contenedor de los servicios -->
-<div class="servicios-container flex justify-center align-center flex-wrap" >
+<div class="servicios-container flex justify-center align-center flex-wrap">
     @foreach ($services as $service)
         <div class="servicio-content" id="service-{{ $service->service_id }}">
             <div class="relative flex flex-col my-6 bg-white shadow-sm border border-slate-200 rounded-lg w-80">
                 <div class="p-4">
                     <div class="mb-2 flex items-center justify-between">
-                        <p class="text-slate-800 text-xl font-semibold">{{ $service->name }}</p>
-                        <p class="text-cyan-600 text-xl font-semibold">₲{{ number_format($service->price, 0, ',', '.') }}</p>
+                        <p class="text-slate-800 text-xl font-semibold editName">{{ $service->name }}</p>
+                        <p class="text-cyan-600 text-xl font-semibold editPrice">₲{{ number_format($service->price, 0, ',', '.') }}</p>
                     </div>
-                    <p class="text-slate-600 leading-normal font-light">{{ $service->description }}</p>
-                    <p class="text-slate-800 text-xl font-semibold">Duracion aprox {{$service->duration}} minutos</p>
+                    <p class="text-slate-600 leading-normal font-light editDescription">{{ $service->description }}</p>
+                    <p class="text-slate-800 text-xl font-semibold editDuration">Duración aprox {{ $service->duration }} minutos</p>
                     <button class="rounded-md w-full mt-2 bg-yellow-600 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-yellow-700 focus:shadow-none active:bg-yellow-700 hover:bg-yellow-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none" type="button" onclick="openEditModal({{ $service->service_id }})">
                         Editar
                     </button>
@@ -95,7 +95,7 @@
                 </div>
             </div>
         </div>
-    @endforeach 
+    @endforeach
 </div>
 
 @include('services.editService')

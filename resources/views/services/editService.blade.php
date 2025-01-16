@@ -2,7 +2,7 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="editarServicioLabel">Editar Servicio</h5>
+                <h5 class="modal-title text-2xl font-semibold text-gray-800"" id="editarServicioLabel">Editar Servicio</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -16,40 +16,34 @@
 
                 <form id="editServiceForm" class="w-100">
                     @csrf
-                    <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="text-left" for="editName">Nombre del Servicio</label>
-                                    <input type="text" class="form-control" id="editName" name="name" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="editPrice">Precio del Servicio</label>
-                                    <input type="number" class="form-control" id="editPrice" name="price" required>
-                                </div>
-                            </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700" for="editName">Nombre del Servicio</label>
+                            <input type="text" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm" id="editName" name="name" required>
                         </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700" for="editPrice">Precio del Servicio</label>
+                            <input type="number" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm" id="editPrice" name="price" required>
+                        </div>                  
+                    </div>
 
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="editDescription">Descripción del Servicio</label>
-                                    <textarea class="form-control" id="editDescription" name="description" rows="3" required></textarea>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="editDuration">Duración del Servicio (en minutos)</label>
-                                    <input type="number" class="form-control" id="editDuration" name="duration" step="0.01" required>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">                       
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700" for="editDescription">Descripción del Servicio</label>
+                            <textarea class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm" id="editDescription" name="description" rows="3" required></textarea>
+                        </div>                   
+                       
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700" for="editDuration">Duración del Servicio (en minutos)</label>
+                            <input type="number" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm" id="editDuration" name="duration" step="0.01" required>
+                        </div>                      
+                    </div>
+                    <div class="mt-6 flex justify-end space-x-4">
+                        <button type="button" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" data-dismiss="modal">Cancelar</button>
+                        <button type="button" class="px-4 py-2 bg-cyan-600 text-white rounded-md hover:bg-cyan-700" onclick="submitEditForm()">Guardar Cambios</button>
+                    </div>
                 </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" onclick="submitEditForm()">Guardar Cambios</button>
             </div>
         </div>
     </div>

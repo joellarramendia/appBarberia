@@ -32,7 +32,10 @@ class ServiceController extends Controller
         $service->duration = $validated['duration'];
         $service->save();
 
-        return response()->json(['success' => true, 'message' => 'Servicio guardado correctamente']);
+        //return response()->json(['success' => true, 'message' => 'Servicio guardado correctamente']);*/
+        //$service = Service::create($validatedData);
+
+        return response()->json(['service' => $service], 201);
        
     }
 
@@ -64,10 +67,31 @@ class ServiceController extends Controller
     }
 
     //funcion para eliminar un servicio
-    public function deleteService($service_id){
+    public function deleteService($service_id)
+{
+    try {
         $service = Service::find($service_id);
+
+        if (!$service) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Servicio no encontrado.',
+            ], 404);
+        }
+
         $service->delete();
-        return response()->json(['message' => 'Service deleted']);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Servicio eliminado correctamente.',
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Ocurrió un error al eliminar el servicio.',
+        ], 500);
     }
+}
+
     
 }

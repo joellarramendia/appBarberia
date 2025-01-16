@@ -25,21 +25,54 @@ async function submitForm() {
                 "Content-Type": "multipart/form-data",
             },
         });
+
+        const newService = response.data.service;
+
+        // Agrega el nuevo servicio al DOM
+        const servicesContainer = document.querySelector(".servicios-container");
+        const serviceElement = `
+        <div class="servicio-content" id="service-${newService.service_id}">
+            <div class="relative flex flex-col my-6 bg-white shadow-sm border border-slate-200 rounded-lg w-80">
+                <div class="p-4">
+                    <div class="mb-2 flex items-center justify-between">
+                        <p class="text-slate-800 text-xl font-semibold">${newService.name}</p>
+                        <p class="text-cyan-600 text-xl font-semibold">₲${new Intl.NumberFormat('es-PY', { style: 'decimal' }).format(newService.price)}</p>
+                    </div>
+                    <p class="text-slate-600 leading-normal font-light">${newService.description}</p>
+                    <p class="text-slate-800 text-xl font-semibold">Duración aprox ${newService.duration} minutos</p>
+                    <button class="rounded-md w-full mt-2 bg-yellow-600 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-yellow-700 focus:shadow-none active:bg-yellow-700 hover:bg-yellow-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none" type="button" onclick="openEditModal(${newService.service_id})">
+                        Editar
+                    </button>
+                    <button class="rounded-md w-full mt-2 bg-red-600 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-red-700 focus:shadow-none active:bg-red-700 hover:bg-red-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none" type="button" onclick="deleteService(${newService.service_id})">
+                        Eliminar
+                    </button>
+                </div>
+            </div>
+        </div>`;
+
+        servicesContainer.insertAdjacentHTML("beforeend", serviceElement);
+
         Swal.fire({
             title: "¡Éxito!",
             text: "Servicio guardado exitosamente.",
             icon: "success",
             confirmButtonText: "Aceptar",
-        }).then(() => {
-            // Recargar la página o actualizar la lista
-            window.location.reload();
         });
+
+        // Limpia el formulario
+        document.getElementById("serviceForm").reset();
+
+       $('#cargarServicio').modal('hide');
+
     } catch (error) {
         console.error("Error al guardar el servicio:", error);
-        alert("No se pudo guardar el servicio. Intente nuevamente.");
+        Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "No se pudo guardar el servicio. Intente nuevamente.",
+        });
     }
 }
-
 
 
 async function openEditModal(service_id) {
@@ -52,7 +85,7 @@ async function openEditModal(service_id) {
         document.getElementById("editDescription").value = service.description;
         document.getElementById("editDuration").value = service.duration;
 
-        //almacenar el id del servicio
+        //almacena el id del servicio
         document.getElementById("editServiceForm").setAttribute('data-service-id', service_id);
 
 
@@ -78,84 +111,115 @@ async function submitEditForm() {
     const duration = parseInt(formData.get("duration"));
 
     if (!name || !description || price <= 0 || duration <= 0) {
-        alert("Por favor, complete todos los campos correctamente.");
+        Swal.fire({
+            title: "Error",
+            text: "Por favor, complete todos los campos correctamente.",
+            icon: "error",
+        });
         return;
     }
+    Swal.fire({
+        title: "¿Deseas guardar los cambios?",
+        showDenyButton: true,
+        showCancelButton: true,
+        confirmButtonText: "Guardar",
+        denyButtonText: "No guardar",
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            try {
+                const response = await axios.post(`/api/updateService/${service_id}`, formData, {
+                    headers: {
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                        "Accept": "application/json",
+                        "Content-Type": "multipart/form-data",
+                    },
+                });
 
-    try {
-        const response = await axios.post(`/api/updateService/${service_id}`, formData, {
-            headers: {
-                "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                "Accept": "application/json",
-                "Content-Type": "multipart/form-data",
-            },
-        });
-        console.log(response);
-        alert("Servicio actualizado exitosamente");
-        // Recargar la página o actualizar la lista
-        window.location.reload();
-    } catch (error) {
-        console.error("Error al actualizar el servicio:", error);
-        // Muestra los errores específicos devueltos por el servidor
-        if (error.response && error.response.data.errors) {
-            alert(JSON.stringify(error.response.data.errors));
-        } else {
-            alert("No se pudo actualizar el servicio. Intente nuevamente.");
+                const data = response.data;
+
+                if (data.success) {
+                    Swal.fire("Guardado", "El servicio fue actualizado exitosamente.", "success");
+                    $('#editarServicio').modal('hide');
+
+                    // Actualiza el DOM dinámicamente
+                    const serviceElement = document.getElementById(`service-${service_id}`);
+                    if (serviceElement) {
+                        serviceElement.querySelector(".editName").textContent = name;
+                        serviceElement.querySelector(".editPrice").textContent = `₲${price.toLocaleString("es-PY")}`;
+                        serviceElement.querySelector(".editDescription").textContent = description;
+                        serviceElement.querySelector(".editDuration").textContent = `Duración aprox ${duration} minutos`;
+                    }
+                } else {
+                    Swal.fire({
+                        title: "Error",
+                        text: data.message || "No se pudo actualizar el servicio.",
+                        icon: "error",
+                    });
+                }
+            } catch (error) {
+                console.error("Error al actualizar el servicio:", error);
+                Swal.fire({
+                    title: "Error",
+                    text: "No se pudo actualizar el servicio. Intente nuevamente.",
+                    icon: "error",
+                });
+            }
+        } else if (result.isDenied) {
+            Swal.fire("Los cambios no fueron guardados", "", "info");
         }
-    }
+    });
 }
 
+//funcion para eliminar el servicio
+async function deleteService(service_id) {
+    Swal.fire({
+        title: "¿Estás seguro?",
+        text: "¡No podrás revertir esto!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Sí, eliminar",
+        cancelButtonText: "Cancelar",
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            document.getElementById("cargando").style.display = "block";
 
-// Función para eliminar un servicio
-/*async function deleteService(service_id) {
-    const confirmation = confirm("¿Estás seguro de que quieres eliminar este servicio?");
-    if (!confirmation) return;
+            try {
+                const response = await axios.delete(`/api/deleteService/${service_id}`, {
+                    headers: {
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                        "Accept": "application/json",
+                    },
+                });
 
-    document.getElementById("cargando").style.display = "block";
+                const data = response.data;
 
-    try {
-        const response = await axios.delete(`/api/deleteService/${service_id}`, {
-            headers: {
-                "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                "Accept": "application/json",
-            },
-        });
-
-        const data = response.data;
-        if (data.success) {
-            alert(data.message);
-            document.getElementById(`service_${service_id}`).remove();
-            
-        } else {
-            alert(data.message);
+                if (data.success) {
+                    Swal.fire({
+                        title: "Eliminado",
+                        text: data.message,
+                        icon: "success",
+                    });
+                    const serviceElement = document.getElementById(`service-${service_id}`);
+                    if (serviceElement) serviceElement.remove();
+                } else {
+                    Swal.fire({
+                        title: "Error",
+                        text: data.message || "No se pudo eliminar el servicio.",
+                        icon: "error",
+                    });
+                }
+            } catch (error) {
+                console.error("Error al eliminar el servicio:", error);
+                Swal.fire({
+                    title: "Error",
+                    text: "Ocurrió un error al intentar eliminar el servicio.",
+                    icon: "error",
+                });
+            }
         }
-    } catch (error) {
-        console.error("Error al eliminar el servicio:", error);
-        alert("No se pudo eliminar el servicio. Intente nuevamente.");
-    } finally {
-        document.getElementById("cargando").style.display = "none";
-        window.location.reload();
-    }
-}*/
+    });
+}
 
-
-
-
-
-/*Swal.fire({
-    title: "Are you sure?",
-    text: "You won't be able to revert this!",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#3085d6",
-    cancelButtonColor: "#d33",
-    confirmButtonText: "Yes, delete it!"
-  }).then((result) => {
-    if (result.isConfirmed) {
-      Swal.fire({
-        title: "Deleted!",
-        text: "Your file has been deleted.",
-        icon: "success"
-      });
-    }
-  });*/
+ 
