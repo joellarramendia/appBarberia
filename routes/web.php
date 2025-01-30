@@ -3,6 +3,9 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\AppointmentController;
+
+
 
 
 Route::get('/', function () {
@@ -11,22 +14,28 @@ Route::get('/', function () {
 
 
 //admin
-Route::get('/admin/appointments', function () {
-    return view('admin.appointments');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/appointments/index', [AppointmentController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 
-Route::get('/admin/registeredClients', function () {
-    return view('admin.registeredClients');
+Route::get('/appointments/registeredClients', function () {
+    return view('appointments.registeredClients');
 });
 
-//cliente
-Route::get('/cliente', function () {
-    return view('cliente.index');
-});
 
 //mostrar los servicios
-Route::get('/services/index', [ServiceController::class, 'index']);
+Route::get('/services/index', [ServiceController::class, 'index'])->middleware('auth');
+
+
+
+
+
+Route::get('/appointments/store', [AppointmentController::class, 'store'])->middleware('auth');
+
+
+
+
 
 
 

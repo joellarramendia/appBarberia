@@ -13,8 +13,9 @@ return new class extends Migration
     {
         Schema::create('appointments', function (Blueprint $table) {
             $table->id('appointment_id');
-            $table->dateTime('start_date');
-            $table->dateTime('finish_date');
+            $table->date('start_date');
+            $table->time('time');
+            $table->time('timeEnd');
             $table->enum('status', ['earring', 'confirmed', 'canceled'])->default('earring');
             $table->unsignedBigInteger('user_id');
             $table->timestamps();

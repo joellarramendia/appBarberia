@@ -15,7 +15,8 @@ class Appointment extends Model
 
     protected $fillable = [
         'start_date',
-        'finish_date',
+        'time',
+        'timeEnd',
         'status',
         'user_id',
     ];
@@ -25,9 +26,9 @@ class Appointment extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function service()
+    public function services()
     {
-        return $this->belongsToMany(Service::class, 'appointment_service', 'appointment_id');
+        return $this->belongsToMany(Service::class, 'appointment_service', 'appointment_id', 'service_id');
     }
 
 

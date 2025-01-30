@@ -323,7 +323,7 @@ return [
         ['header' => 'Etiquetas'],
         [
             'text' => 'Citas',
-            'url' => 'admin/appointments',
+            'url' => 'appointments/index',
             'icon' => 'fas fa-fw fa-calendar',
         ],
         [
@@ -333,7 +333,7 @@ return [
         ],
         [
             'text' => 'Clientes Registrados',
-            'url' => 'admin/registeredClients',
+            'url' => 'appointments/registeredClients',
             'icon' => 'fas fa-fw fa-user',
         ]
         /*[

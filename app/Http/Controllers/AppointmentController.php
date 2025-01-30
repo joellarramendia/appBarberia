@@ -3,8 +3,96 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Appointment;
+use App\Models\User;
+use App\Models\Service;
+
+
 
 class AppointmentController extends Controller
 {
-    //
+    public function index(){
+
+        return view('appointments.index');
+
+    }
+
+    public function store(){
+        $appointments = Appointment::with('services', 'user')->get();
+
+        $events = $appointments->map(function ($appointment) {
+            return [
+                'id' => $appointment->appointment_id,
+                'title' => $appointment->services->pluck('name')->join(', '), // Nombre del servicio
+                'start' => $appointment->start_date . 'T' . $appointment->time, // Formato ISO para FullCalendar
+                'end' => $appointment->start_date . 'T' . $appointment->timeEnd, // Fecha de finalización
+                'extendedProps' => [
+                    'client' => $appointment->user->pluck('name')->join(', '), // Nombre del cliente
+                ]
+            ];
+        });
+    
+        return response()->json($events);
+    }
+
+    public function createAppointment(Request $request)
+    {
+         // Verifica si Laravel está recibiendo correctamente el user_id
+         if (!$request->has('user_id')) {
+            return response()->json(['error' => 'El ID del usuario no fue recibido.'], 400);
+        }
+
+        // Validación
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'start_date' => 'required|date',
+            'time' => 'required|date_format:H:i',
+            'timeEnd' => 'required|date_format:H:i',
+            'status' => 'required|string',
+            'services' => 'required|array',
+            'services.*' => 'exists:services,service_id',
+        ]);
+
+        // Crea la cita
+        $appointment = Appointment::create([
+            'user_id' => $request->user_id,
+            'start_date' => $request->start_date,
+            'time' => $request->time,
+            'timeEnd' => $request->timeEnd,
+            'status' => $request->status,
+        ]);
+
+        // Asigna servicios a la cita
+        $appointment->services()->attach($request->services);
+
+        return response()->json(['message' => 'Cita agendada con éxito', 'appointment' => $appointment], 201);
+    }
+
+
+//funcion para ver disponibilidad de horarios    
+    public function checkAvailability(Request $request){
+        $request->validate([
+            'start_date' => 'required|date',
+            'time' => 'required|date_format:H:i',
+            'timeEnd' => 'required|date_format:H:i|after:time',
+        ]);
+
+        $conflict = Appointment::where('start_date', $request->start_date)
+            ->where(function ($query) use ($request) {
+                $query->whereBetween('time', [$request->time, $request->timeEnd])
+                    ->orWhereBetween('timeEnd', [$request->time, $request->timeEnd])
+                    ->orWhere(function ($q) use ($request) {
+                        $q->where('time', '<=', $request->time)
+                            ->where('timeEnd', '>=', $request->timeEnd);
+                    });
+            })
+            ->exists();
+
+        return response()->json(['available' => !$conflict]);
+    }
+
+
 }
+
+

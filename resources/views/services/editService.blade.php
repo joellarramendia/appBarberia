@@ -19,24 +19,24 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700" for="editName">Nombre del Servicio</label>
-                            <input type="text" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm" id="editName" name="name" required>
+                            <input type="text" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm" id="editName" name="editName" required>
                         </div>
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-700" for="editPrice">Precio del Servicio</label>
-                            <input type="number" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm" id="editPrice" name="price" required>
+                            <input type="number" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm" id="editPrice" name="editPrice" required>
                         </div>                  
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">                       
                         <div>
                             <label class="block text-sm font-medium text-gray-700" for="editDescription">Descripción del Servicio</label>
-                            <textarea class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm" id="editDescription" name="description" rows="3" required></textarea>
+                            <textarea class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm" id="editDescription" name="editDescription" rows="3" required></textarea>
                         </div>                   
                        
                         <div>
                             <label class="block text-sm font-medium text-gray-700" for="editDuration">Duración del Servicio (en minutos)</label>
-                            <input type="number" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm" id="editDuration" name="duration" step="0.01" required>
+                            <input type="number" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm" id="editDuration" name="editDuration" step="0.01" required>
                         </div>                      
                     </div>
                     <div class="mt-6 flex justify-end space-x-4">
