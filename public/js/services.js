@@ -313,6 +313,7 @@ async function createAppointment(event) {
     let startTime = document.getElementById("hora").value;
     let endTime = document.getElementById("horaFin").value;
 
+
     if (servicios.length === 0) {
         Swal.fire("Debe seleccionar al menos un servicio.", "", "warning");
         return;
@@ -323,6 +324,7 @@ async function createAppointment(event) {
         Swal.fire("Error", "Debe seleccionar una fecha válida.", "warning");
         return;
     }
+
 
     let userId = document.getElementById("user").getAttribute("data-id");
     if (!userId) {
@@ -386,6 +388,14 @@ async function createAppointment(event) {
     }
 }
 
+//funcion para limitar la hora de inicio
+document.getElementById("hora").addEventListener("input", function () {
+    let selectedTime = this.value;
+    if (selectedTime < "08:00" || selectedTime > "20:00") {
+        Swal.fire("Error", "Seleccione un horario entre 08:00 y 20:00.", "warning");
+        this.value = ""; // Borra la selección incorrecta
+    }
+});
 
 
 //funcion para actualizar la hora de fin
@@ -394,7 +404,7 @@ function updateEndTime() {
     const startTime = document.getElementById('hora').value;
     if (!startTime) return; // Si no hay hora seleccionada, no hacer nada
 
-    // Calcular el total de minutos de los servicios seleccionados
+    // Calcula el total de minutos de los servicios seleccionados
     let totalMinutes = selectedServices.length 
         ? selectedServices.reduce((sum, service) => sum + (parseInt(service.duration) || 0), 0) 
         : 0; // Si no hay servicios, totalMinutes será 0
@@ -403,7 +413,7 @@ function updateEndTime() {
 
     const [hours, minutes] = startTime.split(':').map(Number); // Convertir la hora en números
 
-    // Verificar si los valores obtenidos son válidos
+    // Verifica si los valores obtenidos son válidos
     if (isNaN(hours) || isNaN(minutes)) {
         document.getElementById('horaFin').value = ""; // Evitar NaN:NaN
         return;
@@ -413,7 +423,7 @@ function updateEndTime() {
     endDate.setHours(hours);
     endDate.setMinutes(minutes + totalMinutes); // Sumar los minutos totales
 
-    // Formatear la nueva hora en HH:MM
+    // Formatea la nueva hora en HH:MM
     const endHours = String(endDate.getHours()).padStart(2, '0');
     const endMinutes = String(endDate.getMinutes()).padStart(2, '0');
 

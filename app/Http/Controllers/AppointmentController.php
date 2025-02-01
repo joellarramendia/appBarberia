@@ -28,7 +28,7 @@ class AppointmentController extends Controller
                 'start' => $appointment->start_date . 'T' . $appointment->time, // Formato ISO para FullCalendar
                 'end' => $appointment->start_date . 'T' . $appointment->timeEnd, // Fecha de finalización
                 'extendedProps' => [
-                    'client' => $appointment->user->pluck('name')->join(', '), // Nombre del cliente
+                    'client' => $appointment->user->name,// Nombre del cliente
                 ]
             ];
         });
@@ -68,6 +68,19 @@ class AppointmentController extends Controller
 
         return response()->json(['message' => 'Cita agendada con éxito', 'appointment' => $appointment], 201);
     }
+
+    public function destroy($appointment_id){
+        $appointment = Appointment::find($appointment_id);
+
+        if (!$appointment) {
+            return response()->json(['message' => 'Cita no encontrada'], 404);
+        }
+
+        $appointment->delete();
+
+        return response()->json(['message' => 'Cita eliminada correctamente']);
+    }
+
 
 
 //funcion para ver disponibilidad de horarios    

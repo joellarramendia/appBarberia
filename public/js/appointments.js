@@ -27,8 +27,39 @@ document.addEventListener('DOMContentLoaded', function () {
                 serviceContainer.appendChild(span);
             });
 
+            // Evento para eliminar la cita con SweetAlert2 y Axios
+            document.getElementById('btnEliminar').onclick = function () {
+                let appointment_id = info.event.id;
+                Swal.fire({
+                    title: "¿Estás seguro?",
+                    text: "Esta acción no se puede deshacer",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Sí, eliminar",
+                    cancelButtonText: "Cancelar"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        axios.delete(`/api/appointments/${appointment_id}`, {
+                            headers: {
+                                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+                            }
+                        })
+                        .then(response => {
+                            Swal.fire("Eliminado", response.data.message, "success");
+                            info.event.remove(); // Eliminar del calendario visualmente
+                            $('#cargarTurno').modal('hide'); // Cerrar el modal
+                        })
+                        .catch(error => {
+                            Swal.fire("Error", "Hubo un problema al eliminar la cita", "error");
+                        });
+                    }
+                });
+            };
+
             // Mostrar el modal
-            $('#cargarTurno').modal('show'); // Si usas Bootstrap 4 o 5
+            $('#cargarTurno').modal('show'); 
         }
     });
 
