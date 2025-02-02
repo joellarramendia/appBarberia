@@ -8,7 +8,7 @@
 @section('content_header')
     <h1>Administrador</h1>
     <div class="text-right">
-      <a href="{{ url('services/index') }}" class="btn btn-success col-2.5">
+      <a href="{{ url('services/index') }}" class="col-2.5 px-4 py-2 bg-cyan-600 text-white rounded-md hover:bg-cyan-700">
       <i class='fa fa-plus'> </i> Nueva cita
       </a>
     </div>
@@ -143,6 +143,5 @@
 @section('js')
 
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.js"></script>
-
     <script src="{{asset('js/appointments.js')}}"></script>
 @stop

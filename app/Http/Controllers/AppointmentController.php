@@ -24,15 +24,16 @@ class AppointmentController extends Controller
         $events = $appointments->map(function ($appointment) {
             return [
                 'id' => $appointment->appointment_id,
-                'title' => $appointment->services->pluck('name')->join(', '), // Nombre del servicio
-                'start' => $appointment->start_date . 'T' . $appointment->time, // Formato ISO para FullCalendar
-                'end' => $appointment->start_date . 'T' . $appointment->timeEnd, // Fecha de finalización
+                'title' => $appointment->user->name, // Formato de título corregido
+                'start' => $appointment->start_date . 'T' . $appointment->time ,
+                'end' => $appointment->start_date . 'T' . $appointment->timeEnd,
                 'extendedProps' => [
-                    'client' => $appointment->user->name,// Nombre del cliente
+                    'client' => $appointment->user->name, // Solo el nombre del cliente
+                    'services' => $appointment->services->pluck('name')->join(', '), // Nombres de los servicios
                 ]
             ];
         });
-    
+
         return response()->json($events);
     }
 

@@ -1,14 +1,28 @@
 document.addEventListener('DOMContentLoaded', function () {
-    var calendarEl = document.getElementById('calendar');
+    let calendarEl = document.getElementById('calendar');
 
-    var calendar = new FullCalendar.Calendar(calendarEl, {
+     let calendar = new FullCalendar.Calendar(calendarEl, {
+         locale: 'es',
         initialView: 'dayGridMonth',
         headerToolbar: {
             left: 'prev,next today',
             center: 'title',
             right: 'dayGridMonth,timeGridWeek,listWeek'
         },
+        buttonText: {
+            today: 'Hoy',
+            month: 'Mes',
+            week: 'Semana',
+            day: 'Día',
+            list: 'Lista'
+        },
         events: '/appointments/store', // Ruta que devuelve los eventos en JSON
+        eventDisplay: 'block', 
+        eventTimeFormat: { // Formato de la hora en FullCalendar
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false // Forzar formato 24 horas
+        },
         eventClick: function (info) {
             // Llenar los campos del modal con la información del evento seleccionado
             document.getElementById('user').value = info.event.extendedProps.client; // Cliente
@@ -19,15 +33,15 @@ document.addEventListener('DOMContentLoaded', function () {
             // Llenar servicios seleccionados
             let serviceContainer = document.getElementById('servicio');
             serviceContainer.innerHTML = ''; // Limpiar antes de agregar nuevos datos
-            let services = info.event.title.split(', ');
+            let services = info.event.extendedProps.services.split(', ');
             services.forEach(service => {
                 let span = document.createElement('span');
-                span.textContent = service;
+                span.textContent = ucwords(service);
                 span.classList.add('bg-gray-200', 'px-2', 'py-1', 'rounded-md');
                 serviceContainer.appendChild(span);
             });
 
-            // Evento para eliminar la cita con SweetAlert2 y Axios
+            // Evento para eliminar la cita 
             document.getElementById('btnEliminar').onclick = function () {
                 let appointment_id = info.event.id;
                 Swal.fire({
@@ -63,5 +77,13 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    window.calendar = calendar;
     calendar.render();
 });
+
+
+function ucwords(str) {
+    return str.replace(/\b\w/g, function(char) {
+        return char.toUpperCase();
+    });
+}
