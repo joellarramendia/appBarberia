@@ -107,7 +107,8 @@ async function openEditModal(service_id) {
 
 //funcion para editar el servicio
 async function submitEditForm() {
-    const service_id = document.getElementById("editServiceForm").getAttribute('data-service-id');
+    const service_id = parseInt(document.getElementById("editServiceForm").getAttribute('data-service-id'));
+
     console.log(service_id);
     const formData = new FormData(document.getElementById("editServiceForm"));
 
@@ -157,6 +158,12 @@ async function submitEditForm() {
                         serviceElement.querySelector(".editDescription").textContent = description;
                         serviceElement.querySelector(".editDuration").textContent = `Duración aprox ${duration} minutos`;
                     }
+                    //Emitir el evento serviceUpdated
+                    const event = new CustomEvent("serviceUpdated", {
+                        detail: { id: service_id, name, price, description, duration }
+                    });
+                    console.log("Evento `serviceUpdated` disparado:", event.detail); 
+                    document.dispatchEvent(event);
                 } else {
                     Swal.fire({
                         title: "Error",
@@ -209,6 +216,13 @@ async function deleteService(service_id) {
                         text: data.message,
                         icon: "success",
                     });
+
+                    // Elimina el servicio de la lista seleccionada
+                    window.selectedServices = window.selectedServices.filter(service => service.id !== service_id);
+                    
+                    // Dispara un evento para que appointments.js actualice la lista
+                    document.dispatchEvent(new CustomEvent('serviceDeleted', { detail: service_id }));
+
                     const serviceElement = document.getElementById(`service-${service_id}`);
                     if (serviceElement) serviceElement.remove();
                 } else {
@@ -231,203 +245,5 @@ async function deleteService(service_id) {
 }
 
 
-//funcion para seleccionar los servicios
-let selectedServices = [];
-function toggleSelection(service_id, service_name, service_duration) {
-    const serviceContainer = document.getElementById('service-' + service_id);
-    serviceContainer.classList.toggle('selected');
-
-    if (serviceContainer.classList.contains('selected')) {
-        selectedServices.push({ id: service_id, name: service_name, duration: parseInt(service_duration) || 0 }); // Añade el servicio seleccionado
-    } else {
-        selectedServices = selectedServices.filter(service => service.id !== service_id); // Elimina el servicio deseleccionado
-    }
-
-    updateSelectedServices();
-    updateEndTime(); // Recalcula la hora de fin
-}
-
-//funcion para actualizar los servicios seleccionados
-function updateSelectedServices() {
-    const selectedServicesList = document.getElementById('servicio');
-    selectedServicesList.innerHTML = ''; // Limpia la lista de servicios seleccionados
-
-    selectedServices.forEach(service => {
-        // Crea un contenedor para el servicio
-        const serviceContainer = document.createElement('div');
-        serviceContainer.classList.add('bg-cyan-200', 'p-2', 'rounded-md', 'flex', 'items-center', 'gap-2');
-
-        // Crea el texto con el nombre del servicio
-        const serviceText = document.createElement('span');
-        serviceText.textContent = ucwords(service.name);
-
-        // Crea el botón de quitar
-        const removeButton = document.createElement('button');
-        removeButton.textContent = 'x';
-        removeButton.classList.add('bg-red-600', 'text-white', 'py-1', 'px-2', 'rounded-md', 'hover:bg-red-700', 'focus:outline-none');
-        removeButton.onclick = () => removeService(service.id); // Llama a la función para quitar el servicio
-
-        // Agrega el texto y el botón al contenedor
-        serviceContainer.appendChild(serviceText);
-        serviceContainer.appendChild(removeButton);
-
-        // Agrega el contenedor al listado de servicios seleccionados
-        selectedServicesList.appendChild(serviceContainer);
-    });
-}
-
-//funcion para quitar el servicio
-function removeService(service_id) {
-    const serviceContainer = document.getElementById('service-' + service_id);
-
-    // Elimina el servicio del arreglo de servicios seleccionados
-    if (serviceContainer.classList.contains('selected')) {
-        serviceContainer.classList.remove('selected'); // Remueve la clase 'selected'
-        selectedServices = selectedServices.filter(service => service.id !== service_id); // Elimina el servicio de la lista
-        console.log(selectedServices);
-
-        // Actualiza la lista de servicios seleccionados en el modal
-        updateSelectedServices();
-        updateEndTime(); // Recalcula la hora de fin
-    }
-}
-
-// Llama a la función cuando se abra el modal para que se muestren los servicios seleccionados
-$('#cargarTurno').on('show.bs.modal', function () {
-    updateSelectedServices(); // Actualiza la lista de servicios seleccionados
-});
-
-
-function getSelectedServices() {
-    return selectedServices;
-}
-
-
-//funcion para crear el turno
-async function createAppointment(event) {
-    event.preventDefault();
-
-    const servicios = getSelectedServices().map(service => service.id);
-    let today = new Date().toISOString().split("T")[0]; // Obtiene la fecha actual en formato YYYY-MM-DD
-    let startDate = document.getElementById("date").value;
-    let startTime = document.getElementById("hora").value;
-    let endTime = document.getElementById("horaFin").value;
-
-
-    if (servicios.length === 0) {
-        Swal.fire("Debe seleccionar al menos un servicio.", "", "warning");
-        return;
-    }
-
-    // Validar que la fecha seleccionada no sea anterior a hoy
-    if (!startDate || startDate < today) {
-        Swal.fire("Error", "Debe seleccionar una fecha válida.", "warning");
-        return;
-    }
-
-
-    let userId = document.getElementById("user").getAttribute("data-id");
-    if (!userId) {
-        Swal.fire("Error", "No se pudo obtener el ID del usuario.", "error");
-        return;
-    }
-
-    if (!startDate) {
-        Swal.fire("Error", "Debe seleccionar la fecha en la que irá.", "warning");
-        return;
-    }
-
-    if (!startTime) {
-        Swal.fire("Error", "Debe seleccionar la hora a la que irá.", "warning");
-        return;
-    }
-
-    try {
-        const availabilityResponse = await axios.post("/api/appointments/checkAvailability", {
-            start_date: startDate,
-            time: startTime,
-            timeEnd: endTime
-        });
-
-        if (!availabilityResponse.data.available) {
-            Swal.fire("Error", "El horario seleccionado ya está ocupado. Elija otro.", "error");
-            return;
-        }
-    } catch (error) {
-        console.error("Error al verificar disponibilidad:", error);
-        Swal.fire("Error", "No se pudo verificar la disponibilidad.", "error");
-        return;
-    }
-
-    const appointmentData = {
-        user_id: userId,
-        start_date: startDate,
-        time: startTime,
-        timeEnd: endTime,
-        status: "earring",
-        services: servicios,
-    };
-
-    try {
-        const response = await axios.post("/api/createAppointment", appointmentData, {
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json",
-                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
-            }
-        });
-
-        if (response.data.error) {
-            Swal.fire("Error", response.data.error, "error");
-        } else {
-            Swal.fire("Turno creado exitosamente", "", "success").then(() => location.reload());
-        }
-    } catch (error) {
-        console.error("Error en la solicitud:", error);
-        Swal.fire("Error", "Hubo un problema al crear el turno.", "error");
-    }
-}
-
-//funcion para limitar la hora de inicio
-document.getElementById("hora").addEventListener("input", function () {
-    let selectedTime = this.value;
-    if (selectedTime < "08:00" || selectedTime > "20:00") {
-        Swal.fire("Error", "Seleccione un horario entre 08:00 y 20:00.", "warning");
-        this.value = ""; // Borra la selección incorrecta
-    }
-});
-
-
-//funcion para actualizar la hora de fin
-document.getElementById('hora').addEventListener('input', updateEndTime);
-function updateEndTime() {
-    const startTime = document.getElementById('hora').value;
-    if (!startTime) return; // Si no hay hora seleccionada, no hacer nada
-
-    // Calcula el total de minutos de los servicios seleccionados
-    let totalMinutes = selectedServices.length 
-        ? selectedServices.reduce((sum, service) => sum + (parseInt(service.duration) || 0), 0) 
-        : 0; // Si no hay servicios, totalMinutes será 0
-        
-    console.log(totalMinutes)
-
-    const [hours, minutes] = startTime.split(':').map(Number); // Convertir la hora en números
-
-    // Verifica si los valores obtenidos son válidos
-    if (isNaN(hours) || isNaN(minutes)) {
-        document.getElementById('horaFin').value = ""; // Evitar NaN:NaN
-        return;
-    }
-
-    const endDate = new Date();
-    endDate.setHours(hours);
-    endDate.setMinutes(minutes + totalMinutes); // Sumar los minutos totales
-
-    // Formatea la nueva hora en HH:MM
-    const endHours = String(endDate.getHours()).padStart(2, '0');
-    const endMinutes = String(endDate.getMinutes()).padStart(2, '0');
-
-    document.getElementById('horaFin').value = `${endHours}:${endMinutes}`;
-}
 
 

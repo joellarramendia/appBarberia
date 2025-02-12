@@ -18,11 +18,11 @@
 @section('content')
     <div id='calendar'></div>
     
-    <div class="modal fade" id="cargarTurno" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="nuevoTurno" aria-hidden="true"> 
+    <div class="modal fade" id="mostrarTurno" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="nuevoTurno" aria-hidden="true"> 
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title text-2xl font-semibold text-gray-800" id="nuevoTurno">Agendar turno</h5>
+                    <h5 class="modal-title text-2xl font-semibold text-gray-800" id="nuevoTurno">Turno Reservado</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>

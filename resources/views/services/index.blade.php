@@ -69,4 +69,5 @@
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.js"></script>
 <script src="{{ asset('js/services.js') }}"></script>
+<script src="{{ asset('js/appointments.js') }}"></script>
 @stop
