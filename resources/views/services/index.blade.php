@@ -7,12 +7,14 @@
 
 
 @section('content_header')
-    <h1>Listado de Servicios</h1>
+    <h1>Servicios</h1>
   <!-- Button trigger modal -->
 <div class="text-right">
+    @role('admin')
     <button type="button" class="col-2.5 px-4 py-2 bg-cyan-600 text-white rounded-md hover:bg-cyan-700" data-toggle="modal" data-target="#cargarServicio">
         <i class="fa fa-plus"></i> Agregar Servicio
     </button>
+    @endrole
     <button type="button" class="col-2.5 px-4 py-2 bg-cyan-600 text-white rounded-md hover:bg-cyan-700" data-toggle="modal" data-target="#cargarTurno">
         <i class="fa fa-plus"></i> Agendar Turno
     </button>
@@ -32,12 +34,14 @@
                     </div>
                     <p class="text-slate-600 leading-normal font-light editDescription">{{ ucwords($service->description) }}</p>
                     <p class="text-slate-800 text-xl font-semibold editDuration">Duración aprox {{ $service->duration }} minutos</p>
+                    @role('admin')
                     <button class="rounded-md w-full mt-2 bg-yellow-600 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-yellow-700 focus:shadow-none active:bg-yellow-700 hover:bg-yellow-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none" type="button" onclick="openEditModal({{ $service->service_id }})">
                         Editar
                     </button>
                     <button class="rounded-md w-full mt-2 bg-red-600 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-red-700 focus:shadow-none active:bg-red-700 hover:bg-red-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none" type="button" onclick="deleteService({{ $service->service_id }})">
                         Eliminar
                     </button>
+                    @endrole
                 </div>
             </div>
         </div>

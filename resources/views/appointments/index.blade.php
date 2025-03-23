@@ -7,7 +7,9 @@
 @vite('resources/js/echo.js')
 
 @section('content_header')
+    @role('admin')
     <h1>Administrador</h1>
+    @endrole
     <div class="text-right">
       <a href="{{ url('services/index') }}" class="col-2.5 px-4 py-2 bg-cyan-600 text-white rounded-md hover:bg-cyan-700">
       <i class='fa fa-plus'> </i> Nueva cita
