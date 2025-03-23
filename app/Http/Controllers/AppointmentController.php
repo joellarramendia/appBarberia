@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Appointment;
 use App\Models\User;
 use App\Models\Service;
-
+use App\Events\NewAppointmentCreated;
 
 
 class AppointmentController extends Controller
@@ -66,6 +66,9 @@ class AppointmentController extends Controller
 
         // Asigna servicios a la cita
         $appointment->services()->attach($request->services);
+
+        // Emitir evento de nueva cita
+        event(new NewAppointmentCreated($appointment));
 
         return response()->json(['message' => 'Cita agendada con éxito', 'appointment' => $appointment], 201);
     }

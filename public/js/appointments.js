@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     cancelButtonText: "Cancelar"
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        axios.delete(`/api/appointments/${appointment_id}`, {
+                        axios.delete(`/api/deleteAppointments/${appointment_id}`, {
                             headers: {
                                 "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
                             }
@@ -71,8 +71,30 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+
+
     window.calendar = calendar;
     calendar.render();
+
+     //Escucha eventos en el canal "appointments" y actualiza el calendario en tiempo real
+     window.Echo.channel('appointments')
+     .listen('.nueva-cita', (data) => {
+         console.log("Nueva cita recibida:", data.appointment);
+
+         calendar.addEvent({
+             id: data.appointment.appointment_id,
+             title: data.appointment.user.name, 
+             start: data.appointment.start_date + 'T' + data.appointment.time,
+             end: data.appointment.start_date + 'T' + data.appointment.timeEnd,
+             extendedProps: {
+                 client: data.appointment.user.name,
+                 services: data.appointment.services.map(service => service.name).join(', '),
+             }
+         });
+
+         console.log("✅ Cita agregada al calendario");
+     });
+    
 });
 
 
@@ -148,7 +170,7 @@ function updateSelectedServices(showRemoveButton = true) {
 }
 
 
-// 🚀 Escuchar el evento `serviceUpdated` para actualizar el modal de agendamiento
+// Escuchar el evento `serviceUpdated` para actualizar el modal de agendamiento
 document.addEventListener("serviceUpdated", (event) => {
     const updatedService = event.detail;
 

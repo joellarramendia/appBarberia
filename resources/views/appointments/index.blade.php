@@ -4,6 +4,7 @@
 
 @vite ('resources/css/app.css')
 @vite('resources/js/app.js')
+@vite('resources/js/echo.js')
 
 @section('content_header')
     <h1>Administrador</h1>
