@@ -28,6 +28,10 @@ class AppointmentController extends Controller
                 'title' => $appointment->user->name, // Formato de título corregido
                 'start' => $appointment->start_date . 'T' . $appointment->time ,
                 'end' => $appointment->start_date . 'T' . $appointment->timeEnd,
+                'status' => $appointment->status,
+                'backgroundColor' => $appointment->status === 'confirmed' ? 'green' : 'yellow',
+                'borderColor' => $appointment->status === 'confirmed' ? 'darkgreen' : 'orange',
+                'textColor' => $appointment->status === 'confirmed' ? 'white' : 'black',
                 'extendedProps' => [
                     'client' => $appointment->user->name, // Solo el nombre del cliente
                     'services' => $appointment->services->pluck('name')->join(', '), // Nombres de los servicios

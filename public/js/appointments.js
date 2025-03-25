@@ -84,11 +84,14 @@ document.addEventListener('DOMContentLoaded', function () {
                             title: 'Cita Confirmada',
                             text: response.data.message,
                             confirmButtonText: 'OK',
-                            timer: 2000
                         });
             
                         // Actualizar el estado de la cita en la interfaz sin recargar
-                        //document.getElementById(`appointment-${appointment_id}`).classList.add('bg-green-500');
+                        info.event.setProp('backgroundColor', 'green');  // Establecer el color de fondo como verde
+                        info.event.setProp('borderColor', 'darkgreen');  // Establecer el color del borde como verde oscuro
+                        info.event.setProp('textColor', 'white');        // Establecer el color del texto como blanco
+
+                        $('#mostrarTurno').modal('hide');
                     })
                     .catch(error => {
                         Swal.fire({
@@ -117,6 +120,11 @@ document.addEventListener('DOMContentLoaded', function () {
      .listen('.nueva-cita', (data) => {
          console.log("Nueva cita recibida:", data.appointment);
 
+        const appointmentStatus = data.appointment.status;
+        const color = appointmentStatus === 'confirmed' ? 'green' : 'yellow';
+        const borderColor = appointmentStatus === 'confirmed' ? 'darkgreen' : 'orange';
+        const textColor = appointmentStatus === 'confirmed' ? 'white' : 'black';
+
          calendar.addEvent({
              id: data.appointment.appointment_id,
              title: data.appointment.user.name, 
@@ -125,7 +133,10 @@ document.addEventListener('DOMContentLoaded', function () {
              extendedProps: {
                  client: data.appointment.user.name,
                  services: data.appointment.services.map(service => service.name).join(', '),
-             }
+             },
+            backgroundColor: color, // Color de fondo según el estado
+            borderColor: borderColor, // Color de borde según el estado
+            textColor: textColor, // Color del texto según el estado
          });
 
          console.log("Cita agregada al calendario");
