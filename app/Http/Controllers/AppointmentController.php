@@ -8,7 +8,8 @@ use App\Models\Appointment;
 use App\Models\User;
 use App\Models\Service;
 use App\Events\NewAppointmentCreated;
-
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ConfirmacionCitaMail;
 
 class AppointmentController extends Controller
 {
@@ -109,6 +110,23 @@ class AppointmentController extends Controller
         return response()->json(['available' => !$conflict]);
     }
 
+    public function confirmAppointment(Request $request, $id){
+        $appointment = Appointment::with('user')->findOrFail($id);
+
+        $appointment->status = 'confirmed';
+        $appointment->save();
+        
+        $user = $appointment->user->name;
+        $services = $appointment->services->pluck('name')->join(', ');
+        $date = $appointment->start_date;
+        $time = $appointment->time;
+        $price = $appointment->services->sum('price');
+
+        // Enviar correo de confirmación
+        Mail::to($appointment->user->email)->send(new ConfirmacionCitaMail($user, $services, $date, $time, $price));
+
+        return response()->json(['message' => 'Cita confirmada y correo enviado con éxito.']);
+    }
 
 }
 

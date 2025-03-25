@@ -23,3 +23,5 @@ Route::delete('/deleteAppointments/{appointment_id}', [AppointmentController::cl
 
 
 Route::post('/appointments/checkAvailability', [AppointmentController::class, 'checkAvailability']);
+
+Route::post('/appointments/{appointment_id}/confirm', [AppointmentController::class, 'confirmAppointment']);

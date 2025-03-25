@@ -66,6 +66,42 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
             };
 
+            //evento para confirmar la cita
+            document.addEventListener("click", function (event) {
+                if (event.target && event.target.id === "btnConfirmar") {
+                    let appointment_id = info.event.id;
+                    console.log(appointment_id);
+                    console.log(document.getElementById(`appointment-${appointment_id}`));
+            
+                    axios.post(`/api/appointments/${appointment_id}/confirm`, {}, {
+                        headers: {
+                            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
+                        }
+                    })
+                    .then(response => {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Cita Confirmada',
+                            text: response.data.message,
+                            confirmButtonText: 'OK',
+                            timer: 2000
+                        });
+            
+                        // Actualizar el estado de la cita en la interfaz sin recargar
+                        //document.getElementById(`appointment-${appointment_id}`).classList.add('bg-green-500');
+                    })
+                    .catch(error => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Hubo un problema al confirmar la cita.',
+                            confirmButtonText: 'Cerrar'
+                        });
+                        console.error("Error:", error);
+                    });
+                }
+            });
+
             // Mostrar el modal
             $('#mostrarTurno').modal('show'); 
         }
@@ -92,7 +128,7 @@ document.addEventListener('DOMContentLoaded', function () {
              }
          });
 
-         console.log("✅ Cita agregada al calendario");
+         console.log("Cita agregada al calendario");
      });
     
 });

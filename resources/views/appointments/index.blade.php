@@ -36,6 +36,10 @@
                         <div class="mx-auto w-full max-w-[550px]">
                             <form>
                                 @csrf
+                                <div class="flex justify-center mb-4">
+                                    <span id="estadoCita" class="badge bg-warning text-white px-3 py-1 rounded-lg text-sm">Pendiente</span>
+                                </div>
+                                
                                 <div class="-mx-3 flex flex-wrap">
                                     <div class="w-full px-3 sm:w-1/2">
                                         <div class="mb-5">
@@ -122,6 +126,10 @@
                                 </div>
                                
                                 <div class="flex justify-center">
+                                    @role('admin')
+                                    <button type="button" class="btn btn-success me-2" id="btnConfirmar">Confirmar</button>
+                                    @endrole
+                                    <button type="button" class="btn btn-primary me-2" id="btnReagendar">Reagendar</button>
                                     <button type="button" class="btn btn-danger" id="btnEliminar">Eliminar</button>
                                 </div>
                             </form>
