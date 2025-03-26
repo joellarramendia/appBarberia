@@ -24,89 +24,104 @@ document.addEventListener('DOMContentLoaded', function () {
             hour12: false // Forzar formato 24 horas
         },
         eventClick: function (info) {
-            // Llenar los campos del modal con la información del evento seleccionado
-            document.getElementById('user').value = info.event.extendedProps.client; // Cliente
-            document.getElementById('date').value = info.event.start.toISOString().split('T')[0]; // Fecha
-            document.getElementById('hora').value = info.event.start.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }); // Hora de inicio
-            document.getElementById('horaFin').value = info.event.end ? info.event.end.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : ''; // Hora fin
+            let userId = document.querySelector('meta[name="user-id"]').getAttribute("content");
+            let userRole = document.querySelector('meta[name="user-role"]').getAttribute("content");
+        
+            let appointmentOwnerId = info.event.extendedProps.client_id; // ID del usuario dueño de la cita
+            console.log(appointmentOwnerId);
+            if(userRole === 'admin' || userId == appointmentOwnerId) {
+                // Llenar los campos del modal con la información del evento seleccionado
+                document.getElementById('user').value = info.event.extendedProps.client; // Cliente
+                document.getElementById('date').value = info.event.start.toISOString().split('T')[0]; // Fecha
+                document.getElementById('hora').value = info.event.start.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }); // Hora de inicio
+                document.getElementById('horaFin').value = info.event.end ? info.event.end.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : ''; // Hora fin
 
-            // Mostrar los servicios seleccionados en el modal
-            let services = info.event.extendedProps.services.split(', ');
-            selectedServices = services.map(service => ({ id: service, name: service }));
-            updateSelectedServices(false); // Actualizar la lista de servicios seleccionados
+                // Mostrar los servicios seleccionados en el modal
+                let services = info.event.extendedProps.services.split(', ');
+                selectedServices = services.map(service => ({ id: service, name: service }));
+                updateSelectedServices(false); // Actualizar la lista de servicios seleccionados
 
-            // Evento para eliminar la cita 
-            document.getElementById('btnEliminar').onclick = function () {
-                let appointment_id = info.event.id;
-                Swal.fire({
-                    title: "¿Estás seguro?",
-                    text: "Esta acción no se puede deshacer",
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#d33",
-                    cancelButtonColor: "#3085d6",
-                    confirmButtonText: "Sí, eliminar",
-                    cancelButtonText: "Cancelar"
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        axios.delete(`/api/deleteAppointments/${appointment_id}`, {
+                // Evento para eliminar la cita 
+                document.getElementById('btnEliminar').onclick = function () {
+                    let appointment_id = info.event.id;
+                    Swal.fire({
+                        title: "¿Estás seguro?",
+                        text: "Esta acción no se puede deshacer",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#d33",
+                        cancelButtonColor: "#3085d6",
+                        confirmButtonText: "Sí, eliminar",
+                        cancelButtonText: "Cancelar"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            axios.delete(`/api/deleteAppointments/${appointment_id}`, {
+                                headers: {
+                                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+                                }
+                            })
+                            .then(response => {
+                                Swal.fire("Eliminado", response.data.message, "success");
+                                info.event.remove(); // Eliminar del calendario visualmente
+                                $('#mostrarTurno').modal('hide'); // Cerrar el modal
+                            })
+                            .catch(error => {
+                                Swal.fire("Error", "Hubo un problema al eliminar la cita", "error");
+                            });
+                        }
+                    });
+                };
+
+                //evento para confirmar la cita
+                document.addEventListener("click", function (event) {
+                    if (event.target && event.target.id === "btnConfirmar") {
+                        let appointment_id = info.event.id;
+                        console.log(appointment_id);
+                        console.log(document.getElementById(`appointment-${appointment_id}`));
+                
+                        axios.post(`/api/appointments/${appointment_id}/confirm`, {}, {
                             headers: {
-                                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+                                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
                             }
                         })
                         .then(response => {
-                            Swal.fire("Eliminado", response.data.message, "success");
-                            info.event.remove(); // Eliminar del calendario visualmente
-                            $('#mostrarTurno').modal('hide'); // Cerrar el modal
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Cita Confirmada',
+                                text: response.data.message,
+                                confirmButtonText: 'OK',
+                            });
+                
+                            // Actualizar el estado de la cita en la interfaz sin recargar
+                            info.event.setProp('backgroundColor', 'green');  // Establecer el color de fondo como verde
+                            info.event.setProp('borderColor', 'darkgreen');  // Establecer el color del borde como verde oscuro
+                            info.event.setProp('textColor', 'white');        // Establecer el color del texto como blanco
+
+                            $('#mostrarTurno').modal('hide');
                         })
                         .catch(error => {
-                            Swal.fire("Error", "Hubo un problema al eliminar la cita", "error");
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Hubo un problema al confirmar la cita.',
+                                confirmButtonText: 'Cerrar'
+                            });
+                            console.error("Error:", error);
                         });
                     }
                 });
-            };
 
-            //evento para confirmar la cita
-            document.addEventListener("click", function (event) {
-                if (event.target && event.target.id === "btnConfirmar") {
-                    let appointment_id = info.event.id;
-                    console.log(appointment_id);
-                    console.log(document.getElementById(`appointment-${appointment_id}`));
-            
-                    axios.post(`/api/appointments/${appointment_id}/confirm`, {}, {
-                        headers: {
-                            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
-                        }
-                    })
-                    .then(response => {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Cita Confirmada',
-                            text: response.data.message,
-                            confirmButtonText: 'OK',
-                        });
-            
-                        // Actualizar el estado de la cita en la interfaz sin recargar
-                        info.event.setProp('backgroundColor', 'green');  // Establecer el color de fondo como verde
-                        info.event.setProp('borderColor', 'darkgreen');  // Establecer el color del borde como verde oscuro
-                        info.event.setProp('textColor', 'white');        // Establecer el color del texto como blanco
-
-                        $('#mostrarTurno').modal('hide');
-                    })
-                    .catch(error => {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'Hubo un problema al confirmar la cita.',
-                            confirmButtonText: 'Cerrar'
-                        });
-                        console.error("Error:", error);
-                    });
-                }
-            });
-
-            // Mostrar el modal
-            $('#mostrarTurno').modal('show'); 
+                // Mostrar el modal
+                $('#mostrarTurno').modal('show'); 
+            } else {
+                // Mostrar un mensaje indicando que no puede ver la cita
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Acceso restringido',
+                    text: 'No puedes ver los detalles de esta cita.',
+                    confirmButtonText: 'Cerrar'
+                });
+            }
         }
     });
 

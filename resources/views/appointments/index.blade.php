@@ -6,6 +6,9 @@
 @vite('resources/js/app.js')
 @vite('resources/js/echo.js')
 
+<meta name="user-id" content="{{ auth()->id() }}">
+<meta name="user-role" content="{{ auth()->user()->hasRole('admin') ? 'admin' : 'cliente' }}">
+
 
 @section('content_header')
     @role('admin')

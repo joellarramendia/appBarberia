@@ -37,6 +37,7 @@ class AppointmentController extends Controller
                 'textColor' => $appointment->status === 'confirmed' ? 'white' : 'black',
                 'extendedProps' => [
                     'client' => $appointment->user->name, // Solo el nombre del cliente
+                    'client_id' => $appointment->user->id, // Enviar el ID del cliente
                     'services' => $appointment->services->pluck('name')->join(', '), // Nombres de los servicios
                 ]
             ];
