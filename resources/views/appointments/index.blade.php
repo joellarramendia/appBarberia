@@ -6,6 +6,7 @@
 @vite('resources/js/app.js')
 @vite('resources/js/echo.js')
 
+
 @section('content_header')
     @role('admin')
     <h1>Administrador</h1>
@@ -35,11 +36,7 @@
                     <div class="flex items-center justify-center p-4">
                         <div class="mx-auto w-full max-w-[550px]">
                             <form>
-                                @csrf
-                                <div class="flex justify-center mb-4">
-                                    <span id="estadoCita" class="badge bg-warning text-white px-3 py-1 rounded-lg text-sm">Pendiente</span>
-                                </div>
-                                
+                                @csrf  
                                 <div class="-mx-3 flex flex-wrap">
                                     <div class="w-full px-3 sm:w-1/2">
                                         <div class="mb-5">

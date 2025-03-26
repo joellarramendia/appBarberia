@@ -20,12 +20,15 @@ class AppointmentController extends Controller
     }
 
     public function store(){
+        $user = auth()->user(); // Obtiene usuario autenticado
         $appointments = Appointment::with('services', 'user')->get();
 
-        $events = $appointments->map(function ($appointment) {
+        $events = $appointments->map(function ($appointment) use ($user) {
+            $isAdmin = $user->hasRole('admin'); // Verifica si el usuario es administrador
+            $isOwner = $appointment->user->id == $user->id; // Verifica si la cita pertenece al usuario
             return [
                 'id' => $appointment->appointment_id,
-                'title' => $appointment->user->name, // Formato de título corregido
+                'title' => ($isOwner || $isAdmin) ? $appointment->user->name : 'Reservado',
                 'start' => $appointment->start_date . 'T' . $appointment->time ,
                 'end' => $appointment->start_date . 'T' . $appointment->timeEnd,
                 'status' => $appointment->status,
