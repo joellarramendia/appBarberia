@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\UserController;
 
 
 
@@ -19,9 +20,7 @@ Route::get('/appointments/index', [AppointmentController::class, 'index'])
     ->name('dashboard');
 
 
-Route::get('/appointments/registeredClients', function () {
-    return view('appointments.registeredClients');
-});
+Route::get('/appointments/registeredClients', [UserController::class, 'index'])->name('appointments.registeredClients');
 
 
 //mostrar los servicios
