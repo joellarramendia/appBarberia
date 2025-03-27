@@ -40,9 +40,17 @@ class AppointmentController extends Controller
             $borderColor = $colors[$status][1] ?? 'darkgray';
             $textColor = $colors[$status][2] ?? 'white';
 
+            $title = 'Reservado'; // Valor por defecto
+            if ($status === 'canceled') {
+                $title = 'Cancelado';
+            } elseif ($isOwner || $isAdmin) {
+                $title = $appointment->user->name;
+            }
+
+
             return [
                 'id' => $appointment->appointment_id,
-                'title' => ($isOwner || $isAdmin) ? $appointment->user->name : 'Reservado',
+                'title' => $title,//($isOwner || $isAdmin) ? $appointment->user->name : 'Reservado',
                 'start' => $appointment->start_date . 'T' . $appointment->time ,
                 'end' => $appointment->start_date . 'T' . $appointment->timeEnd,
                 'status' => $appointment->status,

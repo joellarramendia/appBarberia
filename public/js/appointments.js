@@ -104,6 +104,8 @@ document.addEventListener('DOMContentLoaded', function () {
                                 confirmButtonText: 'OK',
                             });
                 
+                            info.event.setProp('title', info.event.extendedProps.client); 
+
                             // Actualizar el estado de la cita en la interfaz sin recargar
                             info.event.setProp('backgroundColor', 'green');  // Establecer el color de fondo como verde
                             info.event.setProp('borderColor', 'darkgreen');  // Establecer el color del borde como verde oscuro
@@ -146,6 +148,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             .then(response => {
                                 Swal.fire("Cancelada", response.data.message, "success");
                 
+                                info.event.setProp('title', 'Cancelado'); 
                                 // Actualizar el estado de la cita en la interfaz sin recargar
                                 info.event.setProp('backgroundColor', '#f8d7da'); // Rojo claro
                                 info.event.setProp('borderColor', '#dc3545'); // Rojo oscuro
