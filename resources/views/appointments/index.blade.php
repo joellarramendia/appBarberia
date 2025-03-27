@@ -134,6 +134,7 @@
                                     <button type="button" class="btn btn-success me-2" id="btnConfirmar">Confirmar</button>
                                     @endrole
                                     <button type="button" class="btn btn-primary me-2" id="btnReagendar">Reagendar</button>
+                                    <button type="button" class="btn btn-secondary me-2" id="btnCancelar">Cancelar</button>
                                     <button type="button" class="btn btn-danger" id="btnEliminar">Eliminar</button>
                                 </div>
                             </form>

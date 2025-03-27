@@ -111,6 +111,44 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 });
 
+                //evento para cancelar una cita
+                document.getElementById('btnCancelar').onclick = function () {
+                    let appointment_id = info.event.id;
+                
+                    Swal.fire({
+                        title: "¿Estás seguro?",
+                        text: "La cita será cancelada",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#d33",
+                        cancelButtonColor: "#3085d6",
+                        confirmButtonText: "Sí, cancelar",
+                        cancelButtonText: "No"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            axios.post(`/api/appointments/${appointment_id}/cancel`, {}, {
+                                headers: {
+                                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+                                }
+                            })
+                            .then(response => {
+                                Swal.fire("Cancelada", response.data.message, "success");
+                
+                                // Actualizar el estado de la cita en la interfaz sin recargar
+                                info.event.setProp('backgroundColor', '#f8d7da'); // Rojo claro
+                                info.event.setProp('borderColor', '#dc3545'); // Rojo oscuro
+                                info.event.setProp('textColor', 'black'); // Mantener el texto negro
+                
+                                $('#mostrarTurno').modal('hide');
+                            })
+                            .catch(error => {
+                                Swal.fire("Error", "Hubo un problema al cancelar la cita", "error");
+                            });
+                        }
+                    });
+                };
+                
+
                 // Mostrar el modal
                 $('#mostrarTurno').modal('show'); 
             } else {
@@ -130,32 +168,36 @@ document.addEventListener('DOMContentLoaded', function () {
     window.calendar = calendar;
     calendar.render();
 
-     //Escucha eventos en el canal "appointments" y actualiza el calendario en tiempo real
-     window.Echo.channel('appointments')
-     .listen('.nueva-cita', (data) => {
-         console.log("Nueva cita recibida:", data.appointment);
+     
+    // Escucha eventos en el canal "appointments" en tiempo real
+    window.Echo.channel('appointments')
+    .listen('.nueva-cita', (data) => {
+        console.log("Nueva cita recibida:", data.appointment);
 
-        const appointmentStatus = data.appointment.status;
-        const color = appointmentStatus === 'confirmed' ? 'green' : 'yellow';
-        const borderColor = appointmentStatus === 'confirmed' ? 'darkgreen' : 'orange';
-        const textColor = appointmentStatus === 'confirmed' ? 'white' : 'black';
+        const status = data.appointment.status;
+        const colors = {
+            'earring': { bg: 'yellow', border: 'orange', text: 'black' },
+            'confirmed': { bg: 'green', border: 'darkgreen', text: 'white' },
+            'canceled': { bg: '#f8d7da', border: '#dc3545', text: 'black' },
+        };
 
-         calendar.addEvent({
-             id: data.appointment.appointment_id,
-             title: data.appointment.user.name, 
-             start: data.appointment.start_date + 'T' + data.appointment.time,
-             end: data.appointment.start_date + 'T' + data.appointment.timeEnd,
-             extendedProps: {
-                 client: data.appointment.user.name,
-                 services: data.appointment.services.map(service => service.name).join(', '),
-             },
-            backgroundColor: color, // Color de fondo según el estado
-            borderColor: borderColor, // Color de borde según el estado
-            textColor: textColor, // Color del texto según el estado
-         });
+        const { bg, border, text } = colors[status] || { bg: 'gray', border: 'darkgray', text: 'white' };
 
-         console.log("Cita agregada al calendario");
-     });
+        calendar.addEvent({
+            id: data.appointment.appointment_id,
+            title: data.appointment.user.name, 
+            start: data.appointment.start_date + 'T' + data.appointment.time,
+            end: data.appointment.start_date + 'T' + data.appointment.timeEnd,
+            backgroundColor: bg, 
+            borderColor: border, 
+            textColor: text,
+            extendedProps: {
+                client: data.appointment.user.name,
+                client_id: data.appointment.user.id,
+                services: data.appointment.services.map(service => service.name).join(', '),
+            },
+        });
+    });
     
 });
 

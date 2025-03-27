@@ -19,6 +19,7 @@ Route::delete('/deleteService/{service_id}', [ServiceController::class, 'deleteS
 
 Route::post('/createAppointment', [AppointmentController::class, 'createAppointment']);
 Route::delete('/deleteAppointments/{appointment_id}', [AppointmentController::class, 'destroy']);
+Route::post('/appointments/{appointment_id}/cancel', [AppointmentController::class, 'cancel']);
 
 
 
