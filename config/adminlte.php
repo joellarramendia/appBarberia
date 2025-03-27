@@ -63,8 +63,8 @@ return [
     |
     */
 
-    'logo' => '<b>Admin</b>LTE',
-    'logo_img' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
+    'logo' => '<b>TORUSBARBER</b>',
+    'logo_img' => 'vendor/adminlte/dist/img/logo2.png',
     'logo_img_class' => 'brand-image img-circle elevation-3',
     'logo_img_xl' => null,
     'logo_img_xl_class' => 'brand-image-xs',
@@ -329,12 +329,19 @@ return [
         [
             'text' => 'Servicios',
             'url' => 'services/index',
-            'icon' => 'fas fa-fw fa-hand-scissors',
+            'icon' => 'fas fa-cut',
         ],
         [
             'text' => 'Clientes Registrados',
             'url' => 'appointments/registeredClients',
             'icon' => 'fas fa-fw fa-user',
+            'can' => 'view clients',
+        ],
+        [
+            'text' => 'Reporte',
+            'url' => 'appointments/report',
+            'icon' => 'fas fa-fw fa-file-alt',
+            'can' => 'view report', 
         ]
         /*[
             'text' => 'Cambiar Contraseña',

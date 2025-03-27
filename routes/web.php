@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ReportController;
 
 
 
@@ -28,7 +29,7 @@ Route::get('/services/index', [ServiceController::class, 'index'])->middleware('
 
 
 
-
+Route::get('/appointments/report', [ReportController::class, 'index'])->name('appointments.report');
 
 Route::get('/appointments/store', [AppointmentController::class, 'store'])->middleware('auth');
 

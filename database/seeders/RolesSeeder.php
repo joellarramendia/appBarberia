@@ -15,9 +15,16 @@ class RolesSeeder extends Seeder
      */
     public function run(): void
     {
-        //Crear roles solo si no existen
+        //Crear roles 
         $adminRole = Role::firstOrCreate(['name' => 'admin'], ['guard_name' => 'web']);
         $clientRole = Role::firstOrCreate(['name' => 'cliente'], ['guard_name' => 'web']);
+
+        // Crea permisos 
+        $viewClientsPermission = Permission::firstOrCreate(['name' => 'view clients']);
+        $viewReportPermission = Permission::firstOrCreate(['name' => 'view report']);
+
+        // Asignar permisos a admin
+        $adminRole->givePermissionTo([$viewClientsPermission, $viewReportPermission]);
 
         //Asignar rol al usuario con ID 1
         $user = User::find(1);
