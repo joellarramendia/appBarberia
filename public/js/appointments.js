@@ -16,6 +16,14 @@ document.addEventListener('DOMContentLoaded', function () {
             day: 'Día',
             list: 'Lista'
         },
+        // Hacer que el calendario se adapte al tamaño de la pantalla
+        windowResize: function(view) {
+            if (window.innerWidth < 768) {
+                calendar.changeView('listWeek'); // Cambia la vista a lista en pantallas pequeñas
+            } else {
+                calendar.changeView('dayGridMonth'); // Vuelve a la vista de mes en pantallas grandes
+            }
+        },
         events: '/appointments/store', // Ruta que devuelve los eventos en JSON
         eventDisplay: 'block', 
         eventTimeFormat: { // Formato de la hora en FullCalendar
@@ -42,35 +50,39 @@ document.addEventListener('DOMContentLoaded', function () {
                 updateSelectedServices(false); // Actualizar la lista de servicios seleccionados
 
                 // Evento para eliminar la cita 
-                document.getElementById('btnEliminar').onclick = function () {
-                    let appointment_id = info.event.id;
-                    Swal.fire({
-                        title: "¿Estás seguro?",
-                        text: "Esta acción no se puede deshacer",
-                        icon: "warning",
-                        showCancelButton: true,
-                        confirmButtonColor: "#d33",
-                        cancelButtonColor: "#3085d6",
-                        confirmButtonText: "Sí, eliminar",
-                        cancelButtonText: "Cancelar"
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            axios.delete(`/api/deleteAppointments/${appointment_id}`, {
-                                headers: {
-                                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
-                                }
-                            })
-                            .then(response => {
-                                Swal.fire("Eliminado", response.data.message, "success");
-                                info.event.remove(); // Eliminar del calendario visualmente
-                                $('#mostrarTurno').modal('hide'); // Cerrar el modal
-                            })
-                            .catch(error => {
-                                Swal.fire("Error", "Hubo un problema al eliminar la cita", "error");
-                            });
-                        }
-                    });
-                };
+                document.addEventListener("click", function (event) {
+                    if (event.target && event.target.id === "btnEliminar") {
+                        let appointment_id = info.event.id;
+                
+                        Swal.fire({
+                            title: "¿Estás seguro?",
+                            text: "Esta acción no se puede deshacer",
+                            icon: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#d33",
+                            cancelButtonColor: "#3085d6",
+                            confirmButtonText: "Sí, eliminar",
+                            cancelButtonText: "Cancelar"
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                axios.delete(`/api/deleteAppointments/${appointment_id}`, {
+                                    headers: {
+                                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+                                    }
+                                })
+                                .then(response => {
+                                    Swal.fire("Eliminado", response.data.message, "success");
+                                    info.event.remove(); // Eliminar del calendario visualmente
+                                    $('#mostrarTurno').modal('hide'); // Cerrar el modal
+                                })
+                                .catch(error => {
+                                    Swal.fire("Error", "Hubo un problema al eliminar la cita", "error");
+                                    console.error("Error al eliminar:", error);
+                                });
+                            }
+                        });
+                    }
+                });                
 
                 //evento para confirmar la cita
                 document.addEventListener("click", function (event) {

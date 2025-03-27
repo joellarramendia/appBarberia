@@ -135,7 +135,9 @@
                                     @endrole
                                     <button type="button" class="btn btn-primary me-2" id="btnReagendar">Reagendar</button>
                                     <button type="button" class="btn btn-secondary me-2" id="btnCancelar">Cancelar</button>
+                                    @role('admin')
                                     <button type="button" class="btn btn-danger" id="btnEliminar">Eliminar</button>
+                                    @endrole
                                 </div>
                             </form>
                         </div>
@@ -152,8 +154,20 @@
 
 
 @section('css')
-    {{-- Add here extra stylesheets --}}
-    {{-- <link rel="stylesheet" href="/css/admin_custom.css"> --}}
+    <style>
+        #calendar {
+            max-width: 100%;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 768px) {
+            #calendar {
+                font-size: 0.8rem; /* Reducir tamaño de fuente en pantallas pequeñas */
+            }
+
+        }
+    </style>
 @stop
 
 @section('js')
