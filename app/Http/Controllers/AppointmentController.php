@@ -11,6 +11,7 @@ use App\Events\NewAppointmentCreated;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ConfirmacionCitaMail;
 use App\Mail\CancelacionCitaMail;
+use App\Mail\CancelacionCitaToAdmin;
 
 class AppointmentController extends Controller
 {
@@ -152,27 +153,45 @@ class AppointmentController extends Controller
         $time = $appointment->time;
         $price = $appointment->services->sum('price');
 
-        // Enviar correo de confirmación
+        // Envia correo de confirmación
         Mail::to($appointment->user->email)->send(new ConfirmacionCitaMail($user, $services, $date, $time, $price));
 
         return response()->json(['message' => 'Cita confirmada y correo enviado con éxito.']);
     }
 
-    public function cancel(Request $request, $id){
-        $appointment = Appointment::with('user')->findOrFail($id);
+    public function cancel(Request $request, $id)
+{
+    $appointment = Appointment::with('user.roles')->findOrFail($id);
+    $appointment->status = 'canceled';
+    $appointment->save();
 
-        $appointment->status = 'canceled';
-        $appointment->save();
+    $appointmentUser = $appointment->user;
+    $userName = $appointmentUser->name;
+    $date = $appointment->start_date;
+    $time = $appointment->time;
 
-        $user = $appointment->user->name;
-        $date = $appointment->start_date;
-        $time = $appointment->time;
+    // Obtiene el rol del usuario que cancela desde la petición
+    $cancellingRole = $request->query('cancellingRole'); 
 
-        // Enviar correo al cliente notificando la cancelación
-        Mail::to($appointment->user->email)->send(new CancelacionCitaMail($user, $date, $time));
-
-        return response()->json(['message' => 'Cita cancelada. El cliente ha sido notificado.']);
+    // Determina quién está cancelando la cita y envia el correo apropiado
+    if ($cancellingRole === 'admin') {
+        // Admin cancela: envia correo al usuario que agendó la cita
+        Mail::to($appointmentUser->email)->send(new CancelacionCitaMail($userName, $date, $time));
+    } elseif ($cancellingRole === 'cliente') {
+        // Cliente cancela: envia correo al admin
+        Mail::to("barbertorus@gmail.com")->send(new CancelacionCitaToAdmin($userName, $date, $time));
+    } else {
+        // Maneja el caso donde no se proporciona el rol o es inválido
+        return response()->json(['message' => 'Rol de usuario no válido o no proporcionado.'], 400);
     }
+
+    return response()->json(['message' => 'Cita cancelada. Notificación enviada.']);
+}
+    
+
+    
+    
+
 
 }
 

@@ -128,6 +128,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 //evento para cancelar una cita
                 document.getElementById('btnCancelar').onclick = function () {
                     let appointment_id = info.event.id;
+                    let userRole = document.querySelector('meta[name="user-role"]').getAttribute('content');
+                    console.log('Rol del usuario que cancela:', userRole);
                 
                     Swal.fire({
                         title: "¿Estás seguro?",
@@ -140,7 +142,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         cancelButtonText: "No"
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            axios.post(`/api/appointments/${appointment_id}/cancel`, {}, {
+                            axios.post(`/api/appointments/${appointment_id}/cancel?cancellingRole=${userRole}`, {}, {
                                 headers: {
                                     "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
                                 }

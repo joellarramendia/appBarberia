@@ -25,5 +25,13 @@ class RolesSeeder extends Seeder
             $user->assignRole($adminRole);
         }
 
+        // Asignar rol "cliente" a todos los demás usuarios que no sean admin
+        $users = User::where('id', '!=', 1)->get();
+        foreach ($users as $user) {
+            if (!$user->hasRole('admin') && !$user->hasRole('cliente')) {
+                $user->assignRole($clientRole);
+            }
+        }
+
     }
 }
