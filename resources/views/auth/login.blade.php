@@ -3,62 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar Sesión</title>
+    <title>Iniciar Sesión - Barbería Torus</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
-    @vite('resources/css/app.css')
-    @vite('resources/css/login.css')
+    <style>
+        body {
+            background-color: #1A202C;
+            color: #E2E8F0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .login-container {
+            background-color: #2D3748;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 2rem;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+        }
+
+        .logo img {
+            max-width: 150px;
+            margin-bottom: 1rem;
+            border-radius: 50%;
+            align-self: center; 
+        }
+
+        .input-field {
+            background-color: #4A5568;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            border: none;
+            color: #E2E8F0;
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+
+        .input-field:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.5);
+        }
+
+        .btn-primary {
+            background-color: #D2A679;
+            color: #2D3748;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            width: 100%;
+            text-align: center;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #B48E67;
+        }
+
+        .forgot-password, .register {
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .forgot-password a, .register a {
+            color: #D2A679;
+            text-decoration: none;
+        }
+
+        .forgot-password a:hover, .register a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-    <div class="min-h-screen flex flex-col justify-center items-center bg-gray-100 prueba">
-        <!-- Session Status -->
-        <div class="mb-4 text-green-600">
-            <!-- Display session status if exists -->
-            {{ session('status') }}
+    <div class="min-h-screen flex flex-col justify-center items-center">
+        <div class="login-container">
+            <div class="logo">
+                <img src="{{ asset('img/logo2.png') }}" alt="Logo de Barbería Torus">
+                <h2 class="text-2xl font-semibold mb-4">Barbería Torus</h2>
+            </div>
+
+            <form method="POST" action="{{ route('login') }}">
+                <input type="hidden" name="_token" value="{{ csrf_token() }}">
+
+                <div>
+                    <input id="email" class="input-field" type="email" name="email" value="{{ old('email') }}" required autofocus placeholder="Correo">
+                    @if($errors->has('email'))
+                        <span class="text-red-500 text-sm mt-2">{{ $errors->first('email') }}</span>
+                    @endif
+                </div>
+
+                <div class="mt-4">
+                    <input id="password" class="input-field" type="password" name="password" required autocomplete="current-password" placeholder="Contraseña">
+                    @if($errors->has('password'))
+                        <span class="text-red-500 text-sm mt-2">{{ $errors->first('password') }}</span>
+                    @endif
+                </div>
+
+                <div class="mt-6">
+                    <button type="submit" class="btn-primary">Iniciar Sesión</button>
+                </div>
+
+                <div class="forgot-password">
+                    <a href="{{ route('password.request') }}">¿Olvidaste tu contraseña?</a>
+                </div>
+
+                <div class="register">
+                    <a href="{{ route('register') }}">Registrarse</a>
+                </div>
+            </form>
         </div>
-
-        <form method="POST" action="{{ route('login') }}" class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-            <!-- CSRF Token -->
-            <input type="hidden" name="_token" value="{{ csrf_token() }}">
-
-            <!-- Email Address -->
-            <div>
-                <label for="email" class="block text-sm font-medium text-gray-700">Correo</label>
-                <input id="email" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm" type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="username">
-                <!-- Error message for email -->
-                @if($errors->has('email'))
-                    <span class="text-red-500 text-sm mt-2">{{ $errors->first('email') }}</span>
-                @endif
-            </div>
-
-            <!-- Password -->
-            <div class="mt-4">
-                <label for="password" class="block text-sm font-medium text-gray-700">Contraseña</label>
-                <input id="password" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm" type="password" name="password" required autocomplete="current-password">
-                <!-- Error message for password -->
-                @if($errors->has('password'))
-                    <span class="text-red-500 text-sm mt-2">{{ $errors->first('password') }}</span>
-                @endif
-            </div>
-
-            <!-- Remember Me -->
-            <div class="block mt-4">
-                <label for="remember_me" class="inline-flex items-center">
-                    <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
-                    <span class="ml-2 text-sm text-gray-600">Recuérdame</span>
-                </label>
-            </div>
-
-            <!-- Forgot Password and Submit Button -->
-            <div class="flex items-center justify-end mt-4">
-                <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
-                    ¿Olvidaste tu contraseña?
-                </a>
-
-                <button type="submit" class="ml-3 px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md shadow focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    Iniciar Sesión
-                </button>
-            </div>
-        </form>
     </div>
 </body>
 </html>
