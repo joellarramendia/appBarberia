@@ -7,7 +7,11 @@
 
 
 @section('content_header')
-    <h1>Servicios</h1>
+<div class="d-flex align-items-center">
+    <h2 class="text-primary font-weight-bold">
+        <i class="fas fa-cut"></i> Servicios
+    </h2>
+</div>
   <!-- Button trigger modal -->
 <div class="text-right">
     @role('admin')

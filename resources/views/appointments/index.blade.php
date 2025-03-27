@@ -12,7 +12,11 @@
 
 @section('content_header')
     @role('admin')
-    <h1>Administrador</h1>
+    <div class="d-flex align-items-center">
+        <h2 class="text-primary font-weight-bold">
+            <i class="fas fa-user-shield"></i> Administrador
+        </h2>
+    </div>
     @endrole
     <div class="text-right">
       <a href="{{ url('services/index') }}" class="col-2.5 px-4 py-2 bg-cyan-600 text-white rounded-md hover:bg-cyan-700">
