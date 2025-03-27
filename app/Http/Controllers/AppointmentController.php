@@ -10,6 +10,7 @@ use App\Models\Service;
 use App\Events\NewAppointmentCreated;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ConfirmacionCitaMail;
+use App\Mail\CancelacionCitaMail;
 
 class AppointmentController extends Controller
 {
@@ -26,15 +27,28 @@ class AppointmentController extends Controller
         $events = $appointments->map(function ($appointment) use ($user) {
             $isAdmin = $user->hasRole('admin'); // Verifica si el usuario es administrador
             $isOwner = $appointment->user->id == $user->id; // Verifica si la cita pertenece al usuario
+
+             // Definir colores según el estado de la cita
+            $colors = [
+                'earring' => ['yellow', 'orange', 'black'],
+                'confirmed' => ['green', 'darkgreen', 'white'],
+                'canceled' => ['#f8d7da', '#dc3545', 'black'],
+            ];
+
+            $status = $appointment->status;
+            $backgroundColor = $colors[$status][0] ?? 'gray';
+            $borderColor = $colors[$status][1] ?? 'darkgray';
+            $textColor = $colors[$status][2] ?? 'white';
+
             return [
                 'id' => $appointment->appointment_id,
                 'title' => ($isOwner || $isAdmin) ? $appointment->user->name : 'Reservado',
                 'start' => $appointment->start_date . 'T' . $appointment->time ,
                 'end' => $appointment->start_date . 'T' . $appointment->timeEnd,
                 'status' => $appointment->status,
-                'backgroundColor' => $appointment->status === 'confirmed' ? 'green' : 'yellow',
-                'borderColor' => $appointment->status === 'confirmed' ? 'darkgreen' : 'orange',
-                'textColor' => $appointment->status === 'confirmed' ? 'white' : 'black',
+                'backgroundColor' => $backgroundColor,
+                'borderColor' => $borderColor,
+                'textColor' => $textColor,
                 'extendedProps' => [
                     'client' => $appointment->user->name, // Solo el nombre del cliente
                     'client_id' => $appointment->user->id, // Enviar el ID del cliente
@@ -134,6 +148,22 @@ class AppointmentController extends Controller
         Mail::to($appointment->user->email)->send(new ConfirmacionCitaMail($user, $services, $date, $time, $price));
 
         return response()->json(['message' => 'Cita confirmada y correo enviado con éxito.']);
+    }
+
+    public function cancel(Request $request, $id){
+        $appointment = Appointment::with('user')->findOrFail($id);
+
+        $appointment->status = 'canceled';
+        $appointment->save();
+
+        $user = $appointment->user->name;
+        $date = $appointment->start_date;
+        $time = $appointment->time;
+
+        // Enviar correo al cliente notificando la cancelación
+        Mail::to($appointment->user->email)->send(new CancelacionCitaMail($user, $date, $time));
+
+        return response()->json(['message' => 'Cita cancelada. El cliente ha sido notificado.']);
     }
 
 }
