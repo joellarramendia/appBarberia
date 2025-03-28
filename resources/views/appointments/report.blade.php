@@ -4,10 +4,15 @@
 
 @section('content')
 <div class="container mt-4">
-    <h2 class="mb-4 text-center">📊 Reporte Mensual</h2>
+    <h2 class="mb-4 text-center">📊 Reportes</h2>
+
+    <div class="text-center mb-3">
+        <button id="monthlyReportBtn" class="btn btn-primary active">Reporte Mensual</button>
+        <button id="annualReportBtn" class="btn btn-secondary">Reporte Anual</button>
+    </div>
 
     <form id="reportForm" class="p-3 shadow rounded bg-light">
-        <div class="row g-3 align-items-end">
+        <div class="row g-3 align-items-end" id="monthlyFields">
             <div class="col-md-4">
                 <label for="month" class="form-label fw-bold">📅 Seleccionar Mes:</label>
                 <select name="month" id="month" class="form-select">
@@ -18,7 +23,12 @@
                     @endforeach
                 </select>
             </div>
+        </div>
 
+        <div class="row g-3 align-items-end" id="annualFields" style="display: none;">
+        </div>
+
+        <div class="row g-3 align-items-end">
             <div class="col-md-4">
                 <label for="year" class="form-label fw-bold">📆 Seleccionar Año:</label>
                 <select name="year" id="year" class="form-select">
@@ -39,62 +49,47 @@
     </form>
 
     <div id="reportResults" class="row mt-4">
-        <div class="col-md-6 col-lg-3">
-            <div class="card border-0 shadow-sm rounded-lg text-white bg-success">
-                <div class="card-header text-center fw-bold">✅ Servicios Confirmados</div>
-                <div class="card-body text-center">
-                    <h2 class="fw-bold">{{ $confirmedAppointments }}</h2>
-                </div>
-            </div>
         </div>
-
-        <div class="col-md-6 col-lg-3">
-            <div class="card border-0 shadow-sm rounded-lg text-white bg-danger">
-                <div class="card-header text-center fw-bold">❌ Servicios Cancelados</div>
-                <div class="card-body text-center">
-                    <h2 class="fw-bold">{{ $canceledAppointments }}</h2>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-6 col-lg-3">
-            <div class="card border-0 shadow-sm rounded-lg text-white bg-primary">
-                <div class="card-header text-center fw-bold">💰 Total Recaudado</div>
-                <div class="card-body text-center">
-                    <h3 class="fw-bold">Gs. {{ number_format($totalRevenue, 0, ',', '.') }}</h3>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-6 col-lg-3">
-            <div class="card border-0 shadow-sm rounded-lg text-white bg-info">
-                <div class="card-header text-center fw-bold">🆕 Clientes Nuevos</div>
-                <div class="card-body text-center">
-                    <h2 class="fw-bold">{{ $newClients }}</h2>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function() {
-        $('#reportForm').submit(function(e) {
-            e.preventDefault(); // Evita la recarga de la página
+        let reportType = 'monthly'; // Inicialmente, el tipo de reporte es mensual
 
-            var month = $('#month').val();
-            var year = $('#year').val();
+        $('#monthlyReportBtn').click(function() {
+            reportType = 'monthly';
+            $('#monthlyReportBtn').addClass('active').removeClass('secondary');
+            $('#annualReportBtn').addClass('secondary').removeClass('active');
+            $('#monthlyFields').show();
+            $('#annualFields').hide();
+        });
+
+        $('#annualReportBtn').click(function() {
+            reportType = 'annual';
+            $('#annualReportBtn').addClass('active').removeClass('secondary');
+            $('#monthlyReportBtn').addClass('secondary').removeClass('active');
+            $('#monthlyFields').hide();
+            $('#annualFields').show();
+        });
+
+        $('#reportForm').submit(function(e) {
+            e.preventDefault();
+
+            let url = "{{ route('appointments.report') }}";
+            let data = {
+                year: $('#year').val()
+            };
+
+            if (reportType === 'monthly') {
+                data.month = $('#month').val();
+            }
 
             $.ajax({
-                url: "{{ route('appointments.report') }}", // La misma ruta que tu formulario
+                url: url,
                 type: 'GET',
-                data: {
-                    month: month,
-                    year: year
-                },
+                data: data,
                 success: function(data) {
-                    // Actualiza los datos en la sección de resultados
                     $('#reportResults').html(data);
                 },
                 error: function(error) {

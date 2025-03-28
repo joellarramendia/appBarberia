@@ -12,14 +12,19 @@ class ReportController extends Controller
 {
     public function index(Request $request)
     {
-        $selectedMonth = $request->input('month', Carbon::now()->month);
         $selectedYear = $request->input('year', Carbon::now()->year);
+        $selectedMonth = null; // Inicializar $selectedMonth como null
 
-        // Crea una instancia de Carbon para el primer día del mes seleccionado
-        $startDate = Carbon::create($selectedYear, $selectedMonth, 1)->startOfMonth();
-
-        // Crea una instancia de Carbon para el último día del mes seleccionado
-        $endDate = Carbon::create($selectedYear, $selectedMonth, 1)->endOfMonth();
+        if ($request->has('month')) {
+            // Reporte Mensual
+            $selectedMonth = $request->input('month');
+            $startDate = Carbon::create($selectedYear, $selectedMonth, 1)->startOfMonth();
+            $endDate = Carbon::create($selectedYear, $selectedMonth, 1)->endOfMonth();
+        } else {
+            // Reporte Anual
+            $startDate = Carbon::create($selectedYear, 1, 1)->startOfYear();
+            $endDate = Carbon::create($selectedYear, 12, 31)->endOfYear();
+        }
 
         $confirmedAppointments = Appointment::whereBetween('start_date', [$startDate, $endDate])
             ->where('status', 'confirmed')
@@ -37,8 +42,7 @@ class ReportController extends Controller
                 return $appointment->services->sum('price');
             });
 
-        $newClients = User::whereMonth('created_at', $selectedMonth)
-            ->whereYear('created_at', $selectedYear)
+        $newClients = User::whereBetween('created_at', [$startDate, $endDate])
             ->count();
 
         if ($request->ajax()) {
@@ -55,7 +59,7 @@ class ReportController extends Controller
             'canceledAppointments',
             'totalRevenue',
             'newClients',
-            'selectedMonth',
+            'selectedMonth', // $selectedMonth siempre estará definido (puede ser null)
             'selectedYear'
         ));
     }
