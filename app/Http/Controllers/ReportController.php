@@ -11,44 +11,53 @@ use Carbon\Carbon;
 class ReportController extends Controller
 {
     public function index(Request $request)
-{
-    $selectedMonth = $request->input('month', Carbon::now()->month); // Valor predeterminado: mes actual
-    $selectedYear = $request->input('year', Carbon::now()->year); // Valor predeterminado: año actual
+    {
+        $selectedMonth = $request->input('month', Carbon::now()->month);
+        $selectedYear = $request->input('year', Carbon::now()->year);
 
-    // Cantidad de servicios confirmados y cancelados en el mes
-    $confirmedAppointments = Appointment::whereMonth('created_at', $selectedMonth)
-                                        ->whereYear('created_at', $selectedYear)
-                                        ->where('status', 'confirmed')
-                                        ->count();
+        // Crea una instancia de Carbon para el primer día del mes seleccionado
+        $startDate = Carbon::create($selectedYear, $selectedMonth, 1)->startOfMonth();
 
-    $canceledAppointments = Appointment::whereMonth('created_at', $selectedMonth)
-                                       ->whereYear('created_at', $selectedYear)
-                                       ->where('status', 'canceled')
-                                       ->count();
+        // Crea una instancia de Carbon para el último día del mes seleccionado
+        $endDate = Carbon::create($selectedYear, $selectedMonth, 1)->endOfMonth();
 
-    // Monto total recaudado en el mes (sumando precios de los servicios en citas confirmadas)
-    $totalRevenue = Appointment::whereMonth('created_at', $selectedMonth)
-                               ->whereYear('created_at', $selectedYear)
-                               ->where('status', 'confirmed')
-                               ->with('services') // Relación con los servicios
-                               ->get()
-                               ->sum(function ($appointment) {
-                                   return $appointment->services->sum('price'); // Sumar precios de los servicios
-                               });
+        $confirmedAppointments = Appointment::whereBetween('start_date', [$startDate, $endDate])
+            ->where('status', 'confirmed')
+            ->count();
 
-    // Nuevos clientes registrados en el mes
-    $newClients = User::whereMonth('created_at', $selectedMonth)
-                      ->whereYear('created_at', $selectedYear)
-                      ->count();
+        $canceledAppointments = Appointment::whereBetween('start_date', [$startDate, $endDate])
+            ->where('status', 'canceled')
+            ->count();
 
-    return view('appointments.report', compact(
-        'confirmedAppointments', 
-        'canceledAppointments', 
-        'totalRevenue', 
-        'newClients',
-        'selectedMonth',
-        'selectedYear'
-    ));
-}
+        $totalRevenue = Appointment::whereBetween('start_date', [$startDate, $endDate])
+            ->where('status', 'confirmed')
+            ->with('services')
+            ->get()
+            ->sum(function ($appointment) {
+                return $appointment->services->sum('price');
+            });
+
+        $newClients = User::whereMonth('created_at', $selectedMonth)
+            ->whereYear('created_at', $selectedYear)
+            ->count();
+
+        if ($request->ajax()) {
+            return view('appointments.report_results', compact(
+                'confirmedAppointments',
+                'canceledAppointments',
+                'totalRevenue',
+                'newClients'
+            ));
+        }
+
+        return view('appointments.report', compact(
+            'confirmedAppointments',
+            'canceledAppointments',
+            'totalRevenue',
+            'newClients',
+            'selectedMonth',
+            'selectedYear'
+        ));
+    }
 
 }

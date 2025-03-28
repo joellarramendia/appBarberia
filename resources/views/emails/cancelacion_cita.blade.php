@@ -49,7 +49,8 @@
         <h2>Confirmación de Cita</h2>
         
         <p>Estimado<strong> {{ $user }}</strong></p>
-        <p>Nos disculpamos, pero tu cita programada para el {{ $date }} a las {{ $time }} ha sido cancelada.</p>
+        <p>Nos disculpamos, pero tu cita programada para el {{ $date }} a las {{ $time }} ha sido cancelada por motivos de fuerza mayoy.</p>
+        <p>Si deseas puedes agendar tu cita para otra fecha.</p>
         <p>Atentamente, el equipo de la barbería.</p>
 
         <p class="footer">Si tienes alguna pregunta, no dudes en contactarnos al numero 0985634587.</p>
